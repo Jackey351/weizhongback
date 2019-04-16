@@ -1,0 +1,8 @@
+# Ignore log files
+log/
+
+# Ignore GoLand config files
+.idea/
+
+# Ignore VS Code config files
+.vscode/

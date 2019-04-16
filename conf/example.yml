@@ -1,0 +1,6 @@
+---
+basic:
+  debug: true
+  port: "8080"
+log:
+  file: "log/example.log"
