@@ -11,7 +11,7 @@ import (
 
 // FuncHandler 统一错误处理
 // i 传入error,bool,int
-// judge 触发正确值 非error环境下有效
+// judge 不触发错误的值 非error环境下有效
 // 如果触发了错误 return True
 // Example:
 // 1. common.FuncHandler(c, c.BindJSON(&x), nil, http.StatusBadRequest, 20301)
@@ -97,6 +97,7 @@ type appErrJSON struct {
 func ErrorHandling() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Next()
+		//从context获取最新的错误
 		err := c.Errors.Last()
 		if err == nil {
 			return
