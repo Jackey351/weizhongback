@@ -8,3 +8,7 @@ log/
 .vscode/
 
 conf/config\.yml
+
+vendor/
+
+tmp/

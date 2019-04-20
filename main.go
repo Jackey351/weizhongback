@@ -3,12 +3,12 @@ package main
 import (
 	"io"
 
-	"./common"
-	"./controller/misc"
-	"github.com/jinzhu/gorm"
-	"github.com/spf13/viper"
+	"yanfei_backend/common"
+	"yanfei_backend/controller/misc"
 
 	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
+	"github.com/spf13/viper"
 )
 
 func migrate(db *gorm.DB) {
