@@ -2,5 +2,6 @@
 basic:
   debug: true
   port: "8080"
+  maintenance: false
 log:
   file: "log/example.log"

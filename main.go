@@ -37,6 +37,7 @@ func main() {
 	r := gin.Default()
 	// Error handling
 	r.Use(common.ErrorHandling())
+	r.Use(common.MaintenanceHandling())
 
 	r.GET("/ping", misc.Ping)
 	r.Run() // listen and serve on 0.0.0.0:8080
