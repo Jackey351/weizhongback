@@ -5,10 +5,18 @@ import (
 
 	"./common"
 	"./controller/misc"
+	"github.com/jinzhu/gorm"
 	"github.com/spf13/viper"
 
 	"github.com/gin-gonic/gin"
 )
+
+func migrate(db *gorm.DB) {
+	// 后面可以使用AutoMigrate，保持数据库的统一
+	// AutoMigration只会根据struct tag建立新表、没有的列以及索引
+	// 不会改变已经存在的列的类型或者删除没有用到的列
+	db.Set("gorm:table_options", "ENGINE=InnoDB CHARSET=utf8mb4 COLLATE=utf8mb4_bin auto_increment=1")
+}
 
 // init 在 main 之前执行
 func init() {
@@ -19,6 +27,10 @@ func init() {
 
 	// init logger
 	common.InitLogger()
+
+	// init Database
+	db := common.InitMySQL()
+	migrate(db)
 }
 
 func main() {
@@ -40,5 +52,5 @@ func main() {
 	r.Use(common.MaintenanceHandling())
 
 	r.GET("/ping", misc.Ping)
-	r.Run() // listen and serve on 0.0.0.0:8080
+	r.Run()
 }

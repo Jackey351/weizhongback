@@ -6,3 +6,5 @@ log/
 
 # Ignore VS Code config files
 .vscode/
+
+conf/config\.yml

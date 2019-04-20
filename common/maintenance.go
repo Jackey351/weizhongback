@@ -9,9 +9,9 @@ import (
 	"github.com/spf13/viper"
 )
 
+// MaintenanceHandling 维护模式中间件
 func MaintenanceHandling() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// Can we use `FuncHandler` in this middleware logic?
 		if viper.GetBool("basic.maintenance") {
 			c.JSON(http.StatusServiceUnavailable, gin.H{
 				"err_code": 10008,

@@ -9,12 +9,13 @@ import (
 	"github.com/spf13/viper"
 )
 
+// SetConfig 配置设置
 func SetConfig() error {
-	viper.SetConfigName("example")
+	viper.SetConfigName("config")
 	viper.AddConfigPath("conf")
 	viper.SetConfigType("yaml")
 	viper.AutomaticEnv()
-	viper.SetEnvPrefix("EXAMPLE")
+	viper.SetEnvPrefix("FEIYAN")
 	replacer := strings.NewReplacer(".", "_")
 	viper.SetEnvKeyReplacer(replacer)
 	err := viper.ReadInConfig() // Find and read the config file
@@ -27,6 +28,7 @@ func SetConfig() error {
 	return nil
 }
 
+// WatchConfig 监控配置变化
 func WatchConfig() error {
 	viper.WatchConfig()
 	viper.OnConfigChange(func(e fsnotify.Event) {
@@ -35,6 +37,7 @@ func WatchConfig() error {
 	return nil
 }
 
+// DefaultConfig 默认配置
 func DefaultConfig() error {
 	// basic default values
 	viper.SetDefault("basic.debug", true)

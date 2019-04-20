@@ -13,6 +13,7 @@ var (
 	err     error
 )
 
+// InitLogger 初始化logger
 func InitLogger() {
 
 	os.Mkdir("log", os.ModePerm|os.ModeDir)
@@ -26,6 +27,7 @@ func InitLogger() {
 	}
 }
 
+// GetLogFile 获取log文件
 func GetLogFile() *os.File {
 	return logFile
 }
