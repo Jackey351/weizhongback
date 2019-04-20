@@ -4,6 +4,7 @@ import (
 	"io"
 
 	"yanfei_backend/common"
+	"yanfei_backend/controller"
 	"yanfei_backend/controller/misc"
 
 	"github.com/gin-gonic/gin"
@@ -30,6 +31,8 @@ func init() {
 
 	// init Database
 	db := common.InitMySQL()
+	// 禁止在表名后面加s
+	db.SingularTable(true)
 	migrate(db)
 }
 
@@ -47,10 +50,14 @@ func main() {
 	}
 
 	r := gin.Default()
-	// Error handling
+	// middleware
 	r.Use(common.ErrorHandling())
 	r.Use(common.MaintenanceHandling())
 
+	// 路由
 	r.GET("/ping", misc.Ping)
-	r.Run()
+	// user相关路由
+	r.GET("/user/login", controller.Login)
+
+	r.Run("0.0.0.0:" + viper.GetString("basic.port"))
 }
