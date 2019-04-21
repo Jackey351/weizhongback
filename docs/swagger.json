@@ -34,6 +34,48 @@
                 }
             }
         },
+        "/wx/info/project_types": {
+            "get": {
+                "description": "获取所有工程类别",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "wx"
+                ],
+                "summary": "获取所有工程类别",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/controller.Message"
+                        }
+                    }
+                }
+            }
+        },
+        "/wx/info/worker_types": {
+            "get": {
+                "description": "获取所有工种",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "wx"
+                ],
+                "summary": "获取所有工种",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/controller.Message"
+                        }
+                    }
+                }
+            }
+        },
         "/wx/user/new_user": {
             "post": {
                 "description": "小程序端新添用户",

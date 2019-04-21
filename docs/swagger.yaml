@@ -53,6 +53,34 @@ paths:
       summary: PING-PONG
       tags:
       - miscellaneous
+  /wx/info/project_types:
+    get:
+      description: 获取所有工程类别
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.Message'
+            type: object
+      summary: 获取所有工程类别
+      tags:
+      - wx
+  /wx/info/worker_types:
+    get:
+      description: 获取所有工种
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.Message'
+            type: object
+      summary: 获取所有工种
+      tags:
+      - wx
   /wx/user/new_user:
     post:
       consumes:
