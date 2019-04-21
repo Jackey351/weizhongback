@@ -6,9 +6,13 @@ import (
 	"yanfei_backend/common"
 	"yanfei_backend/controller"
 
+	_ "yanfei_backend/docs"
+
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/spf13/viper"
+	ginSwagger "github.com/swaggo/gin-swagger"
+	"github.com/swaggo/gin-swagger/swaggerFiles"
 )
 
 func migrate(db *gorm.DB) {
@@ -35,6 +39,8 @@ func init() {
 	migrate(db)
 }
 
+// @title YANFEI API
+// @version 0.0.1
 func main() {
 	// Before init router
 	if viper.GetBool("basic.debug") {
@@ -52,6 +58,11 @@ func main() {
 	// middleware
 	r.Use(common.ErrorHandling())
 	r.Use(common.MaintenanceHandling())
+
+	// swagger router
+	if viper.GetBool("basic.debug") {
+		r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	}
 
 	// 路由
 	r.GET("/ping", controller.Ping)

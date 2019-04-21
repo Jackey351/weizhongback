@@ -1,0 +1,34 @@
+basePath: '{{.BasePath}}'
+definitions:
+  controller.Message:
+    properties:
+      data:
+        type: object
+      status:
+        type: integer
+    type: object
+host: '{{.Host}}'
+info:
+  contact: {}
+  description: '{{.Description}}'
+  license: {}
+  title: YANFEI API
+  version: 0.0.1
+paths:
+  /ping:
+    get:
+      consumes:
+      - application/json
+      description: 测试服务器是否在线
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.Message'
+            type: object
+      summary: PING-PONG
+      tags:
+      - miscellaneous
+swagger: "2.0"
