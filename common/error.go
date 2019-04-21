@@ -162,4 +162,6 @@ var Errors = map[int]string{
 
 	// 应用级错误
 	20000: "Application error",
+	20001: "参数错误",
+	20002: "数据库错误",
 }

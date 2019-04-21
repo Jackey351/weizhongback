@@ -33,6 +33,43 @@
                     }
                 }
             }
+        },
+        "/wx/user/new_user": {
+            "post": {
+                "description": "小程序端新添用户",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "wx",
+                    "user"
+                ],
+                "summary": "小程序端新添用户",
+                "parameters": [
+                    {
+                        "description": "create a new user",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/model.WxUser"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/controller.Message"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -43,6 +80,37 @@
                     "type": "object"
                 },
                 "status": {
+                    "type": "integer"
+                }
+            }
+        },
+        "model.WxUser": {
+            "type": "object",
+            "properties": {
+                "hometown": {
+                    "type": "string",
+                    "example": "江苏"
+                },
+                "nick_name": {
+                    "type": "string",
+                    "example": "飞燕一号"
+                },
+                "phone": {
+                    "type": "string",
+                    "example": "133333"
+                },
+                "real_name": {
+                    "type": "string",
+                    "example": "张三"
+                },
+                "role": {
+                    "type": "integer"
+                },
+                "sex": {
+                    "type": "string",
+                    "example": "男"
+                },
+                "user_id": {
                     "type": "integer"
                 }
             }

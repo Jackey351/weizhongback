@@ -7,6 +7,28 @@ definitions:
       status:
         type: integer
     type: object
+  model.WxUser:
+    properties:
+      hometown:
+        example: 江苏
+        type: string
+      nick_name:
+        example: 飞燕一号
+        type: string
+      phone:
+        example: "133333"
+        type: string
+      real_name:
+        example: 张三
+        type: string
+      role:
+        type: integer
+      sex:
+        example: 男
+        type: string
+      user_id:
+        type: integer
+    type: object
 host: '{{.Host}}'
 info:
   contact: {}
@@ -31,4 +53,29 @@ paths:
       summary: PING-PONG
       tags:
       - miscellaneous
+  /wx/user/new_user:
+    post:
+      consumes:
+      - application/json
+      description: 小程序端新添用户
+      parameters:
+      - description: create a new user
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.WxUser'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.Message'
+            type: object
+      summary: 小程序端新添用户
+      tags:
+      - wx
+      - user
 swagger: "2.0"

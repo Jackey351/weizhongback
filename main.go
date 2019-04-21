@@ -5,6 +5,7 @@ import (
 
 	"yanfei_backend/common"
 	"yanfei_backend/controller"
+	"yanfei_backend/controller/wx"
 
 	_ "yanfei_backend/docs"
 
@@ -61,13 +62,13 @@ func main() {
 
 	// swagger router
 	if viper.GetBool("basic.debug") {
-		r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+		r.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	}
 
 	// 路由
 	r.GET("/ping", controller.Ping)
-	// user相关路由
-	r.GET("/user/login", controller.Login)
+	// 小程序路由
+	r.POST("/wx/user/new_user", wx.NewWxUser)
 
 	r.Run("0.0.0.0:" + viper.GetString("basic.port"))
 }
