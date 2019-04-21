@@ -89,7 +89,7 @@ type GeneralReturn struct {
 	AppErrJSON    appErrJSON
 }
 type appErrJSON struct {
-	ErrCode int    `json:"err_code"`
+	ErrCode int    `json:"status"`
 	Message string `json:"message"`
 }
 

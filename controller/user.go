@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Login 登录
 func Login(c *gin.Context) {
 	name := c.DefaultQuery("name", "")
 	password := c.DefaultQuery("password", "")
@@ -25,5 +26,7 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, user)
+	c.JSON(http.StatusOK, Message{
+		Data: user,
+	})
 }

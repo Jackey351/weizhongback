@@ -5,7 +5,6 @@ import (
 
 	"yanfei_backend/common"
 	"yanfei_backend/controller"
-	"yanfei_backend/controller/misc"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
@@ -55,7 +54,7 @@ func main() {
 	r.Use(common.MaintenanceHandling())
 
 	// 路由
-	r.GET("/ping", misc.Ping)
+	r.GET("/ping", controller.Ping)
 	// user相关路由
 	r.GET("/user/login", controller.Login)
 

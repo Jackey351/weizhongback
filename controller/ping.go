@@ -1,4 +1,4 @@
-package misc
+package controller
 
 import (
 	"net/http"
@@ -15,7 +15,7 @@ import (
 // @Success 200 {object} misc.Message
 // @Router /ping [get]
 func Ping(c *gin.Context) {
-	c.JSON(http.StatusOK, PingMessage{
-		Message: "pong",
+	c.JSON(http.StatusOK, Message{
+		Data: "pong",
 	})
 }
