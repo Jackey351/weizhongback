@@ -98,7 +98,49 @@
                         "required": true,
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/model.WxUser"
+                            "$ref": "#/definitions/model.WxUserWrapper"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/controller.Message"
+                        }
+                    }
+                }
+            }
+        },
+        "/wx/work/publish": {
+            "post": {
+                "description": "发布工作",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "wx"
+                ],
+                "summary": "发布工作",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "工种 0(点工),1(包工)",
+                        "name": "type",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "description": "点工招聘",
+                        "name": "点工示例数据",
+                        "in": "body",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/model.DianWorkWrapper"
                         }
                     }
                 ],
@@ -126,7 +168,91 @@
                 }
             }
         },
-        "model.WxUser": {
+        "model.DianWorkWrapper": {
+            "type": "object",
+            "properties": {
+                "construction_company": {
+                    "type": "string",
+                    "example": "飞燕工程队"
+                },
+                "desc": {
+                    "type": "string",
+                    "example": "包吃包住"
+                },
+                "final_treatment": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "location": {
+                    "type": "string",
+                    "example": "湖北省襄阳市"
+                },
+                "location_info": {
+                    "type": "object",
+                    "$ref": "#/definitions/model.LocationInfoWrapper"
+                },
+                "max_wage": {
+                    "type": "string",
+                    "example": "200"
+                },
+                "min_wage": {
+                    "type": "string",
+                    "example": "100"
+                },
+                "need": {
+                    "type": "string",
+                    "example": "钢筋工"
+                },
+                "pricing_mode": {
+                    "type": "string",
+                    "example": "点工"
+                },
+                "project_name": {
+                    "type": "string",
+                    "example": "主楼建造"
+                },
+                "required_people": {
+                    "type": "string",
+                    "example": "11"
+                },
+                "settlement": {
+                    "type": "string",
+                    "example": "月薪"
+                },
+                "type": {
+                    "type": "string",
+                    "example": "消防"
+                },
+                "user_id": {
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
+        "model.LocationInfoWrapper": {
+            "type": "object",
+            "properties": {
+                "addr": {
+                    "type": "string",
+                    "example": "湖北省襄阳市樊城区武商广场店对面人民公园"
+                },
+                "latitude": {
+                    "type": "string",
+                    "example": "32.04278"
+                },
+                "longitude": {
+                    "type": "string",
+                    "example": "112.15519"
+                },
+                "title": {
+                    "type": "string",
+                    "example": "人民广场"
+                }
+            }
+        },
+        "model.WxUserWrapper": {
             "type": "object",
             "properties": {
                 "hometown": {
@@ -145,15 +271,9 @@
                     "type": "string",
                     "example": "张三"
                 },
-                "role": {
-                    "type": "integer"
-                },
                 "sex": {
                     "type": "string",
                     "example": "男"
-                },
-                "user_id": {
-                    "type": "integer"
                 }
             }
         }

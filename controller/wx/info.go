@@ -17,7 +17,7 @@ import (
 // @Success 200 {object} controller.Message
 // @Router /wx/info/worker_types [get]
 func GetWokerType(c *gin.Context) {
-	var types []model.WokerType
+	var types []model.WorkerType
 
 	db := common.GetMySQL()
 

@@ -71,6 +71,7 @@ func main() {
 	r.POST("/wx/user/new_user", wx.NewWxUser)
 	r.GET("/wx/info/worker_types", wx.GetWokerType)
 	r.GET("/wx/info/project_types", wx.GetProjectType)
+	r.POST("/wx/work/publish", wx.PublishWork)
 
 	r.Run("0.0.0.0:" + viper.GetString("basic.port"))
 }

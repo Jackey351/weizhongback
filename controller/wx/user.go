@@ -13,13 +13,13 @@ import (
 // @Summary 小程序端新添用户
 // @Description 小程序端新添用户
 // @Tags wx,user
-// @Param user body model.WxUser true "create a new user"
+// @Param user body model.WxUserWrapper true "create a new user"
 // @Accept json
 // @Produce json
 // @Success 200 {object} controller.Message
 // @Router /wx/user/new_user [post]
 func NewWxUser(c *gin.Context) {
-	var newUserReq model.WxUserReq
+	var newUserReq model.WxUserWrapper
 
 	// 获取数据失败
 	if common.FuncHandler(c, c.BindJSON(&newUserReq), nil, 20001) {
@@ -27,7 +27,7 @@ func NewWxUser(c *gin.Context) {
 	}
 
 	var newUser model.WxUser
-	newUser.WxUserReq = newUserReq
+	newUser.WxUserWrapper = newUserReq
 	newUser.Role = 3
 
 	db := common.GetMySQL()
