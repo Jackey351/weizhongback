@@ -2,6 +2,7 @@ package wx
 
 import (
 	"net/http"
+	"strconv"
 	"strings"
 	"yanfei_backend/common"
 	"yanfei_backend/controller"
@@ -14,7 +15,7 @@ import (
 // @Summary 发布工作
 // @Description 发布工作
 // @Tags wx
-// @Param type query string true "工种 0(点工),1(包工)"
+// @Param type query string true "工种 0(点工),1(包工) 必填"
 // @Param 点工示例数据 body model.DianWorkWrapper false "点工招聘"
 // @Accept json
 // @Produce json
@@ -159,8 +160,164 @@ func PublishWork(c *gin.Context) {
 
 		tx.Commit()
 		c.JSON(http.StatusOK, controller.Message{
-			Data: "发布成功",
+			Msg: "发布成功",
 		})
 	}
 
+}
+
+// SearchWork 搜索工作
+// @Summary 搜索工作
+// @Description 搜索工作，需要某个筛选参数就加上，否则可以不加
+// @Tags wx
+// @Param location query string false "二级位置信息 选填"
+// @Param need query string false "所需工种 选填"
+// @Param type query string false "工程类别 选填"
+// @Param page query string true "页码，从1开始 必填"
+// @Param limit query string true "每页记录数 必填"
+// @Produce json
+// @Success 200 {object} controller.Message
+// @Router /wx/work/search [get]
+func SearchWork(c *gin.Context) {
+	projectType := c.Query("type")
+	need := c.Query("need")
+	location := c.Query("location")
+
+	page, err := strconv.Atoi(c.Query("page"))
+	if common.FuncHandler(c, err, nil, 20001) {
+		return
+	}
+	var limit int
+	limit, err = strconv.Atoi(c.Query("limit"))
+	if common.FuncHandler(c, err, nil, 20001) {
+		return
+	}
+	if common.FuncHandler(c, page > 0 && limit > 0, true, 30001) {
+		return
+	}
+
+	db := common.GetMySQL()
+	var count int
+	db.Table("work").Count(&count)
+	totalPage := count / limit
+	if count%limit != 0 {
+		totalPage++
+	}
+
+	var ret map[string]interface{}
+	ret = make(map[string]interface{})
+	ret["total_pages"] = totalPage
+	ret["current_page"] = page
+
+	filterBy := ""
+	var filter []interface{}
+	if projectType != "" {
+		var res model.ProjectType
+		err := db.Where("name = ?", projectType).First(&res).Error
+		// 找不到数据
+		if common.FuncHandler(c, err, nil, 30000) {
+			return
+		}
+
+		filterBy += "project_type = ?"
+		filter = append(filter, projectType)
+	}
+
+	if need != "" {
+		var res model.WorkerType
+		err := db.Where("name = ?", need).First(&res).Error
+		// 找不到数据
+		if common.FuncHandler(c, err, nil, 30001) {
+			return
+		}
+
+		if filterBy != "" {
+			filterBy += " AND "
+		}
+		filterBy += "worker_type = ?"
+		filter = append(filter, need)
+	}
+
+	if location != "" {
+		if filterBy != "" {
+			filterBy += " AND "
+		}
+		filterBy += "location = ? "
+		filter = append(filter, location)
+	}
+
+	var works []model.Work
+	dbWhere := db.Where(filterBy, filter...)
+	dbWhere = db.Limit(limit).Offset((page - 1) * limit)
+	err = dbWhere.Find(&works).Error
+
+	// 找不到数据
+	if err != nil {
+		c.JSON(http.StatusOK, controller.Message{
+			Msg: "无数据",
+		})
+	} else {
+		var mWork []interface{}
+
+		for _, work := range works {
+			if work.PricingMode == "点工" {
+				var dianWorkRet model.DianWorkReturn
+				dianWorkRet.ID = work.ID
+				dianWorkRet.BasicWork = work.BasicWork
+				dianWorkRet.Treatment = work.Treatment
+
+				locationID := work.LocationID
+				dianID := work.Fid
+
+				var locationInfo model.LocationInfo
+				err := db.First(&locationInfo, locationID).Error
+				// 找不到数据
+				if common.FuncHandler(c, err, nil, 20002) {
+					return
+				}
+				dianWorkRet.LocationInfoWrapper = locationInfo.LocationInfoWrapper
+
+				var dianWork model.DianWork
+				err = db.First(&dianWork, dianID).Error
+				// 找不到数据
+				if common.FuncHandler(c, err, nil, 20002) {
+					return
+				}
+				dianWorkRet.DianWorkOther = dianWork.DianWorkOther
+
+				mWork = append(mWork, dianWorkRet)
+			} else {
+				var dianWorkRet model.BaoWorkReturn
+				dianWorkRet.ID = work.ID
+				dianWorkRet.BasicWork = work.BasicWork
+				dianWorkRet.Treatment = work.Treatment
+
+				locationID := work.LocationID
+				baoID := work.Fid
+
+				var locationInfo model.LocationInfo
+				err := db.First(&locationInfo, locationID).Error
+				// 找不到数据
+				if common.FuncHandler(c, err, nil, 20002) {
+					return
+				}
+				dianWorkRet.LocationInfoWrapper = locationInfo.LocationInfoWrapper
+
+				var baoWork model.BaoWork
+				err = db.First(&baoWork, baoID).Error
+				// 找不到数据
+				if common.FuncHandler(c, err, nil, 20002) {
+					return
+				}
+				dianWorkRet.BaoWorkOther = baoWork.BaoWorkOther
+
+				mWork = append(mWork, dianWorkRet)
+			}
+		}
+
+		ret["data"] = mWork
+		c.JSON(http.StatusOK, controller.Message{
+			Data: ret,
+		})
+	}
 }

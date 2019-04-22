@@ -35,11 +35,29 @@ type WorkWrapper struct {
 
 // Work 有id
 type Work struct {
-	ID int64
+	ID int64 `json:"work_id"`
 	BasicWork
-	Treatment  string
+	Treatment  string `json:"treatment"`
 	LocationID int64
 	Fid        int64
+}
+
+// DianWorkReturn 点工作为返回值
+type DianWorkReturn struct {
+	ID int64 `json:"work_id"`
+	BasicWork
+	Treatment           string              `json:"treatment"`
+	LocationInfoWrapper LocationInfoWrapper `json:"location_info"`
+	DianWorkOther
+}
+
+// BaoWorkReturn 包工作为返回值
+type BaoWorkReturn struct {
+	ID int64 `json:"work_id"`
+	BasicWork
+	Treatment           string              `json:"treatment"`
+	LocationInfoWrapper LocationInfoWrapper `json:"location_info"`
+	BaoWorkOther
 }
 
 // DianWorkOther 点工额外信息

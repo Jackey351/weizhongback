@@ -129,7 +129,7 @@
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "工种 0(点工),1(包工)",
+                        "description": "工种 0(点工),1(包工) 必填",
                         "name": "type",
                         "in": "query",
                         "required": true
@@ -154,6 +154,61 @@
                     }
                 }
             }
+        },
+        "/wx/work/search": {
+            "get": {
+                "description": "搜索工作，需要某个筛选参数就加上，否则可以不加",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "wx"
+                ],
+                "summary": "搜索工作",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "二级位置信息 选填",
+                        "name": "location",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "所需工种 选填",
+                        "name": "need",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "工程类别 选填",
+                        "name": "type",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "页码，从1开始 必填",
+                        "name": "page",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "每页记录数 必填",
+                        "name": "limit",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/controller.Message"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -162,6 +217,9 @@
             "properties": {
                 "data": {
                     "type": "object"
+                },
+                "message": {
+                    "type": "string"
                 },
                 "status": {
                     "type": "integer"

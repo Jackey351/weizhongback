@@ -4,6 +4,8 @@ definitions:
     properties:
       data:
         type: object
+      message:
+        type: string
       status:
         type: integer
     type: object
@@ -169,7 +171,7 @@ paths:
       - application/json
       description: 发布工作
       parameters:
-      - description: 工种 0(点工),1(包工)
+      - description: 工种 0(点工),1(包工) 必填
         in: query
         name: type
         required: true
@@ -189,6 +191,43 @@ paths:
             $ref: '#/definitions/controller.Message'
             type: object
       summary: 发布工作
+      tags:
+      - wx
+  /wx/work/search:
+    get:
+      description: 搜索工作，需要某个筛选参数就加上，否则可以不加
+      parameters:
+      - description: 二级位置信息 选填
+        in: query
+        name: location
+        type: string
+      - description: 所需工种 选填
+        in: query
+        name: need
+        type: string
+      - description: 工程类别 选填
+        in: query
+        name: type
+        type: string
+      - description: 页码，从1开始 必填
+        in: query
+        name: page
+        required: true
+        type: string
+      - description: 每页记录数 必填
+        in: query
+        name: limit
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.Message'
+            type: object
+      summary: 搜索工作
       tags:
       - wx
 swagger: "2.0"
