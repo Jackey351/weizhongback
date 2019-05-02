@@ -197,20 +197,7 @@ func SearchWork(c *gin.Context) {
 	}
 
 	db := common.GetMySQL()
-	var count int
-	db.Table("work").Count(&count)
-	totalPage := count / limit
-	if count%limit != 0 {
-		totalPage++
-	}
-
-	var ret map[string]interface{}
-	ret = make(map[string]interface{})
-	ret["total_pages"] = totalPage
-	ret["current_page"] = page
-
-	filterBy := ""
-	var filter []interface{}
+	dbsearch := common.GetMySQL()
 	if projectType != "" {
 		var res model.ProjectType
 		err := db.Where("name = ?", projectType).First(&res).Error
@@ -219,8 +206,7 @@ func SearchWork(c *gin.Context) {
 			return
 		}
 
-		filterBy += "project_type = ?"
-		filter = append(filter, projectType)
+		dbsearch = dbsearch.Where("project_type = ?", projectType)
 	}
 
 	if need != "" {
@@ -231,25 +217,24 @@ func SearchWork(c *gin.Context) {
 			return
 		}
 
-		if filterBy != "" {
-			filterBy += " AND "
-		}
-		filterBy += "worker_type = ?"
-		filter = append(filter, need)
+		dbsearch = dbsearch.Where("worker_type = ?", need)
 	}
 
 	if location != "" {
-		if filterBy != "" {
-			filterBy += " AND "
-		}
-		filterBy += "location = ? "
-		filter = append(filter, location)
+		dbsearch = dbsearch.Where("location = ? ", location)
 	}
 
 	var works []model.Work
-	dbWhere := db.Where(filterBy, filter...)
-	dbWhere = db.Limit(limit).Offset((page - 1) * limit)
-	err = dbWhere.Find(&works).Error
+	err = dbsearch.Find(&works).Error
+
+	count := len(works)
+	totalPage := count / limit
+	if count%limit != 0 {
+		totalPage++
+	}
+
+	dbsearch = dbsearch.Limit(limit).Offset((page - 1) * limit)
+	err = dbsearch.Find(&works).Error
 
 	// 找不到数据
 	if err != nil {
@@ -315,6 +300,10 @@ func SearchWork(c *gin.Context) {
 			}
 		}
 
+		var ret map[string]interface{}
+		ret = make(map[string]interface{})
+		ret["total_pages"] = totalPage
+		ret["current_page"] = page
 		ret["data"] = mWork
 		c.JSON(http.StatusOK, controller.Message{
 			Data: ret,
