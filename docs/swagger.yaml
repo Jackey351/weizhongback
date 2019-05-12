@@ -195,7 +195,7 @@ paths:
       - wx
   /wx/work/search:
     get:
-      description: 搜索工作，需要某个筛选参数就加上，否则可以不加
+      description: 搜索工作，需要某个筛选参数就加上，否则可以不加；按发布时间降序排序
       parameters:
       - description: 二级位置信息 选填
         in: query

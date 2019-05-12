@@ -24,6 +24,7 @@ type BasicWork struct {
 	ProjectName         string `json:"project_name" example:"主楼建造"`
 	ProjectType         string `json:"type" example:"消防"`
 	UserID              int64  `json:"user_id" example:"1"`
+	PublishTime         int64  `json:"publish_time"`
 }
 
 // WorkWrapper 工作请求wrapper
