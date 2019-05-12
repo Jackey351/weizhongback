@@ -49,7 +49,7 @@ type DianWorkReturn struct {
 	BasicWork
 	PricingMode         string              `json:"pricing_mode"`
 	PublishTime         int64               `json:"publish_time"`
-	Treatment           string              `json:"treatment"`
+	Treatment           []string            `json:"final_treatment"`
 	LocationInfoWrapper LocationInfoWrapper `json:"location_info"`
 	DianWorkOther
 }
@@ -60,7 +60,7 @@ type BaoWorkReturn struct {
 	BasicWork
 	PricingMode         string              `json:"pricing_mode"`
 	PublishTime         int64               `json:"publish_time"`
-	Treatment           string              `json:"treatment"`
+	Treatment           []string            `json:"final_treatment"`
 	LocationInfoWrapper LocationInfoWrapper `json:"location_info"`
 	BaoWorkOther
 }

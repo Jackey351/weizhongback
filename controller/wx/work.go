@@ -81,7 +81,7 @@ func PublishWork(c *gin.Context) {
 		var work model.Work
 		work.BasicWork = workWrapper.WorkWrapper.BasicWork
 		work.LocationID = locationInfo.ID
-		work.Treatment = strings.Join(workWrapper.WorkWrapper.Treatment, ", ")
+		work.Treatment = strings.Join(workWrapper.WorkWrapper.Treatment, ",")
 		work.Fid = dianWork.ID
 		work.PricingMode = "点工"
 		work.PublishTime = time.Now().Unix()
@@ -150,7 +150,7 @@ func PublishWork(c *gin.Context) {
 		var work model.Work
 		work.BasicWork = workWrapper.WorkWrapper.BasicWork
 		work.LocationID = locationInfo.ID
-		work.Treatment = strings.Join(workWrapper.WorkWrapper.Treatment, ", ")
+		work.Treatment = strings.Join(workWrapper.WorkWrapper.Treatment, ",")
 		work.Fid = baoWork.ID
 		work.PricingMode = "包工"
 		work.PublishTime = time.Now().Unix()
@@ -254,7 +254,7 @@ func SearchWork(c *gin.Context) {
 				var dianWorkRet model.DianWorkReturn
 				dianWorkRet.ID = work.ID
 				dianWorkRet.BasicWork = work.BasicWork
-				dianWorkRet.Treatment = work.Treatment
+				dianWorkRet.Treatment = strings.Split(work.Treatment, ",")
 				dianWorkRet.PricingMode = work.PricingMode
 				dianWorkRet.PublishTime = work.PublishTime
 
@@ -282,7 +282,7 @@ func SearchWork(c *gin.Context) {
 				var baoWorkRet model.BaoWorkReturn
 				baoWorkRet.ID = work.ID
 				baoWorkRet.BasicWork = work.BasicWork
-				baoWorkRet.Treatment = work.Treatment
+				baoWorkRet.Treatment = strings.Split(work.Treatment, ",")
 				baoWorkRet.PricingMode = work.PricingMode
 				baoWorkRet.PublishTime = work.PublishTime
 
