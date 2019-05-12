@@ -129,7 +129,7 @@
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "工种 0(点工),1(包工) 必填",
+                        "description": "工种 0(点工),1(包工),2(突击队) 必填",
                         "name": "type",
                         "in": "query",
                         "required": true
@@ -140,7 +140,7 @@
                         "in": "body",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/model.DianWorkWrapper"
+                            "$ref": "#/definitions/model.TujiWorkWrapper"
                         }
                     }
                 ],
@@ -226,7 +226,28 @@
                 }
             }
         },
-        "model.DianWorkWrapper": {
+        "model.LocationInfoWrapper": {
+            "type": "object",
+            "properties": {
+                "addr": {
+                    "type": "string",
+                    "example": "湖北省襄阳市樊城区武商广场店对面人民公园"
+                },
+                "latitude": {
+                    "type": "string",
+                    "example": "32.04278"
+                },
+                "longitude": {
+                    "type": "string",
+                    "example": "112.15519"
+                },
+                "title": {
+                    "type": "string",
+                    "example": "人民广场"
+                }
+            }
+        },
+        "model.TujiWorkWrapper": {
             "type": "object",
             "properties": {
                 "construction_company": {
@@ -251,13 +272,13 @@
                     "type": "object",
                     "$ref": "#/definitions/model.LocationInfoWrapper"
                 },
-                "max_wage": {
-                    "type": "string",
-                    "example": "200"
+                "money": {
+                    "type": "integer",
+                    "example": 80
                 },
-                "min_wage": {
+                "nav": {
                     "type": "string",
-                    "example": "100"
+                    "example": "工人"
                 },
                 "need": {
                     "type": "string",
@@ -268,12 +289,8 @@
                     "example": "主楼建造"
                 },
                 "required_people": {
-                    "type": "string",
-                    "example": "11"
-                },
-                "settlement": {
-                    "type": "string",
-                    "example": "月薪"
+                    "type": "integer",
+                    "example": 12
                 },
                 "type": {
                     "type": "string",
@@ -282,27 +299,18 @@
                 "user_id": {
                     "type": "integer",
                     "example": 1
-                }
-            }
-        },
-        "model.LocationInfoWrapper": {
-            "type": "object",
-            "properties": {
-                "addr": {
-                    "type": "string",
-                    "example": "湖北省襄阳市樊城区武商广场店对面人民公园"
                 },
-                "latitude": {
+                "work_date": {
                     "type": "string",
-                    "example": "32.04278"
+                    "example": "2019-05-12"
                 },
-                "longitude": {
-                    "type": "string",
-                    "example": "112.15519"
+                "work_days": {
+                    "type": "integer",
+                    "example": 10
                 },
-                "title": {
+                "work_time": {
                     "type": "string",
-                    "example": "人民广场"
+                    "example": "8"
                 }
             }
         },
