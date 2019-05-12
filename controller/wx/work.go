@@ -17,7 +17,7 @@ import (
 // @Description 发布工作
 // @Tags wx
 // @Param type query string true "工种 0(点工),1(包工),2(突击队) 必填"
-// @Param 点工示例数据 body model.TujiWorkWrapper false "点工招聘"
+// @Param 点工示例数据 body model.DianWorkWrapper false "点工招聘"
 // @Accept json
 // @Produce json
 // @Success 200 {object} controller.Message

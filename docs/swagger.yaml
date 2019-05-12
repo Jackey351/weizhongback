@@ -9,22 +9,7 @@ definitions:
       status:
         type: integer
     type: object
-  model.LocationInfoWrapper:
-    properties:
-      addr:
-        example: 湖北省襄阳市樊城区武商广场店对面人民公园
-        type: string
-      latitude:
-        example: "32.04278"
-        type: string
-      longitude:
-        example: "112.15519"
-        type: string
-      title:
-        example: 人民广场
-        type: string
-    type: object
-  model.TujiWorkWrapper:
+  model.DianWorkWrapper:
     properties:
       construction_company:
         example: 飞燕工程队
@@ -42,9 +27,12 @@ definitions:
       location_info:
         $ref: '#/definitions/model.LocationInfoWrapper'
         type: object
-      money:
-        example: 80
-        type: integer
+      max_wage:
+        example: "200"
+        type: string
+      min_wage:
+        example: "100"
+        type: string
       nav:
         example: 工人
         type: string
@@ -55,22 +43,31 @@ definitions:
         example: 主楼建造
         type: string
       required_people:
-        example: 12
-        type: integer
+        example: "11"
+        type: string
+      settlement:
+        example: 月薪
+        type: string
       type:
         example: 消防
         type: string
       user_id:
         example: 1
         type: integer
-      work_date:
-        example: "2019-05-12"
+    type: object
+  model.LocationInfoWrapper:
+    properties:
+      addr:
+        example: 湖北省襄阳市樊城区武商广场店对面人民公园
         type: string
-      work_days:
-        example: 10
-        type: integer
-      work_time:
-        example: "8"
+      latitude:
+        example: "32.04278"
+        type: string
+      longitude:
+        example: "112.15519"
+        type: string
+      title:
+        example: 人民广场
         type: string
     type: object
   model.WxUserWrapper:
@@ -183,7 +180,7 @@ paths:
         in: body
         name: 点工示例数据
         schema:
-          $ref: '#/definitions/model.TujiWorkWrapper'
+          $ref: '#/definitions/model.DianWorkWrapper'
           type: object
       produces:
       - application/json

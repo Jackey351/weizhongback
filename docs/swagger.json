@@ -140,7 +140,7 @@
                         "in": "body",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/model.TujiWorkWrapper"
+                            "$ref": "#/definitions/model.DianWorkWrapper"
                         }
                     }
                 ],
@@ -226,28 +226,7 @@
                 }
             }
         },
-        "model.LocationInfoWrapper": {
-            "type": "object",
-            "properties": {
-                "addr": {
-                    "type": "string",
-                    "example": "湖北省襄阳市樊城区武商广场店对面人民公园"
-                },
-                "latitude": {
-                    "type": "string",
-                    "example": "32.04278"
-                },
-                "longitude": {
-                    "type": "string",
-                    "example": "112.15519"
-                },
-                "title": {
-                    "type": "string",
-                    "example": "人民广场"
-                }
-            }
-        },
-        "model.TujiWorkWrapper": {
+        "model.DianWorkWrapper": {
             "type": "object",
             "properties": {
                 "construction_company": {
@@ -272,9 +251,13 @@
                     "type": "object",
                     "$ref": "#/definitions/model.LocationInfoWrapper"
                 },
-                "money": {
-                    "type": "integer",
-                    "example": 80
+                "max_wage": {
+                    "type": "string",
+                    "example": "200"
+                },
+                "min_wage": {
+                    "type": "string",
+                    "example": "100"
                 },
                 "nav": {
                     "type": "string",
@@ -289,8 +272,12 @@
                     "example": "主楼建造"
                 },
                 "required_people": {
-                    "type": "integer",
-                    "example": 12
+                    "type": "string",
+                    "example": "11"
+                },
+                "settlement": {
+                    "type": "string",
+                    "example": "月薪"
                 },
                 "type": {
                     "type": "string",
@@ -299,18 +286,27 @@
                 "user_id": {
                     "type": "integer",
                     "example": 1
-                },
-                "work_date": {
+                }
+            }
+        },
+        "model.LocationInfoWrapper": {
+            "type": "object",
+            "properties": {
+                "addr": {
                     "type": "string",
-                    "example": "2019-05-12"
+                    "example": "湖北省襄阳市樊城区武商广场店对面人民公园"
                 },
-                "work_days": {
-                    "type": "integer",
-                    "example": 10
-                },
-                "work_time": {
+                "latitude": {
                     "type": "string",
-                    "example": "8"
+                    "example": "32.04278"
+                },
+                "longitude": {
+                    "type": "string",
+                    "example": "112.15519"
+                },
+                "title": {
+                    "type": "string",
+                    "example": "人民广场"
                 }
             }
         },
