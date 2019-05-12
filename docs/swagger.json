@@ -263,10 +263,6 @@
                     "type": "string",
                     "example": "钢筋工"
                 },
-                "pricing_mode": {
-                    "type": "string",
-                    "example": "点工"
-                },
                 "project_name": {
                     "type": "string",
                     "example": "主楼建造"

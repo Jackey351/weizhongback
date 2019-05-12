@@ -14,17 +14,15 @@ type LocationInfo struct {
 	LocationInfoWrapper
 }
 
-// BasicWork 基本信息
+// BasicWork 基本信息，不管啥类型都有的字段且出现在请求信息中
 type BasicWork struct {
 	ConstructionCompany string `json:"construction_company" example:"飞燕工程队"`
 	Desc                string `json:"desc" example:"包吃包住"`
 	Location            string `json:"location" example:"湖北省襄阳市"`
 	WorkerType          string `json:"need" example:"钢筋工"`
-	PricingMode         string `json:"pricing_mode" example:"点工"`
 	ProjectName         string `json:"project_name" example:"主楼建造"`
 	ProjectType         string `json:"type" example:"消防"`
 	UserID              int64  `json:"user_id" example:"1"`
-	PublishTime         int64  `json:"publish_time"`
 }
 
 // WorkWrapper 工作请求wrapper
@@ -34,19 +32,23 @@ type WorkWrapper struct {
 	LocationInfoWrapper LocationInfoWrapper `json:"location_info"`
 }
 
-// Work 有id
+// Work 与数据表work字段对应
 type Work struct {
 	ID int64 `json:"work_id"`
 	BasicWork
-	Treatment  string `json:"treatment"`
-	LocationID int64
-	Fid        int64
+	PricingMode string `json:"pricing_mode"`
+	PublishTime int64  `json:"publish_time"`
+	Treatment   string `json:"treatment"`
+	LocationID  int64
+	Fid         int64
 }
 
 // DianWorkReturn 点工作为返回值
 type DianWorkReturn struct {
 	ID int64 `json:"work_id"`
 	BasicWork
+	PricingMode         string              `json:"pricing_mode"`
+	PublishTime         int64               `json:"publish_time"`
 	Treatment           string              `json:"treatment"`
 	LocationInfoWrapper LocationInfoWrapper `json:"location_info"`
 	DianWorkOther
@@ -56,6 +58,8 @@ type DianWorkReturn struct {
 type BaoWorkReturn struct {
 	ID int64 `json:"work_id"`
 	BasicWork
+	PricingMode         string              `json:"pricing_mode"`
+	PublishTime         int64               `json:"publish_time"`
 	Treatment           string              `json:"treatment"`
 	LocationInfoWrapper LocationInfoWrapper `json:"location_info"`
 	BaoWorkOther

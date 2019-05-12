@@ -83,7 +83,8 @@ func PublishWork(c *gin.Context) {
 		work.LocationID = locationInfo.ID
 		work.Treatment = strings.Join(workWrapper.WorkWrapper.Treatment, ", ")
 		work.Fid = dianWork.ID
-		work.BasicWork.PublishTime = time.Now().Unix()
+		work.PricingMode = "点工"
+		work.PublishTime = time.Now().Unix()
 
 		err = tx.Create(&work).Error
 		// 数据库错误
@@ -151,7 +152,8 @@ func PublishWork(c *gin.Context) {
 		work.LocationID = locationInfo.ID
 		work.Treatment = strings.Join(workWrapper.WorkWrapper.Treatment, ", ")
 		work.Fid = baoWork.ID
-		work.BasicWork.PublishTime = time.Now().Unix()
+		work.PricingMode = "包工"
+		work.PublishTime = time.Now().Unix()
 
 		err = tx.Create(&work).Error
 		// 数据库错误
@@ -253,6 +255,8 @@ func SearchWork(c *gin.Context) {
 				dianWorkRet.ID = work.ID
 				dianWorkRet.BasicWork = work.BasicWork
 				dianWorkRet.Treatment = work.Treatment
+				dianWorkRet.PricingMode = work.PricingMode
+				dianWorkRet.PublishTime = work.PublishTime
 
 				locationID := work.LocationID
 				dianID := work.Fid
@@ -275,10 +279,12 @@ func SearchWork(c *gin.Context) {
 
 				mWork = append(mWork, dianWorkRet)
 			} else {
-				var dianWorkRet model.BaoWorkReturn
-				dianWorkRet.ID = work.ID
-				dianWorkRet.BasicWork = work.BasicWork
-				dianWorkRet.Treatment = work.Treatment
+				var baoWorkRet model.BaoWorkReturn
+				baoWorkRet.ID = work.ID
+				baoWorkRet.BasicWork = work.BasicWork
+				baoWorkRet.Treatment = work.Treatment
+				baoWorkRet.PricingMode = work.PricingMode
+				baoWorkRet.PublishTime = work.PublishTime
 
 				locationID := work.LocationID
 				baoID := work.Fid
@@ -289,7 +295,7 @@ func SearchWork(c *gin.Context) {
 				if common.FuncHandler(c, err, nil, 20002) {
 					return
 				}
-				dianWorkRet.LocationInfoWrapper = locationInfo.LocationInfoWrapper
+				baoWorkRet.LocationInfoWrapper = locationInfo.LocationInfoWrapper
 
 				var baoWork model.BaoWork
 				err = db.First(&baoWork, baoID).Error
@@ -297,9 +303,9 @@ func SearchWork(c *gin.Context) {
 				if common.FuncHandler(c, err, nil, 20002) {
 					return
 				}
-				dianWorkRet.BaoWorkOther = baoWork.BaoWorkOther
+				baoWorkRet.BaoWorkOther = baoWork.BaoWorkOther
 
-				mWork = append(mWork, dianWorkRet)
+				mWork = append(mWork, baoWorkRet)
 			}
 		}
 

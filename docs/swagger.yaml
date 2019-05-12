@@ -36,9 +36,6 @@ definitions:
       need:
         example: 钢筋工
         type: string
-      pricing_mode:
-        example: 点工
-        type: string
       project_name:
         example: 主楼建造
         type: string
