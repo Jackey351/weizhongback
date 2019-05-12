@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 	"yanfei_backend/common"
 	"yanfei_backend/controller"
 	"yanfei_backend/model"
@@ -82,6 +83,7 @@ func PublishWork(c *gin.Context) {
 		work.LocationID = locationInfo.ID
 		work.Treatment = strings.Join(workWrapper.WorkWrapper.Treatment, ", ")
 		work.Fid = dianWork.ID
+		work.BasicWork.PublishTime = time.Now().Unix()
 
 		err = tx.Create(&work).Error
 		// 数据库错误
@@ -149,6 +151,7 @@ func PublishWork(c *gin.Context) {
 		work.LocationID = locationInfo.ID
 		work.Treatment = strings.Join(workWrapper.WorkWrapper.Treatment, ", ")
 		work.Fid = baoWork.ID
+		work.BasicWork.PublishTime = time.Now().Unix()
 
 		err = tx.Create(&work).Error
 		// 数据库错误
@@ -168,7 +171,7 @@ func PublishWork(c *gin.Context) {
 
 // SearchWork 搜索工作
 // @Summary 搜索工作
-// @Description 搜索工作，需要某个筛选参数就加上，否则可以不加
+// @Description 搜索工作，需要某个筛选参数就加上，否则可以不加；按发布时间降序排序
 // @Tags wx
 // @Param location query string false "二级位置信息 选填"
 // @Param need query string false "所需工种 选填"
@@ -233,7 +236,7 @@ func SearchWork(c *gin.Context) {
 		totalPage++
 	}
 
-	dbsearch = dbsearch.Limit(limit).Offset((page - 1) * limit)
+	dbsearch = dbsearch.Order("publish_time desc").Limit(limit).Offset((page - 1) * limit)
 	err = dbsearch.Find(&works).Error
 
 	// 找不到数据
