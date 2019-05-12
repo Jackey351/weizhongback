@@ -23,6 +23,7 @@ type BasicWork struct {
 	ProjectName         string `json:"project_name" example:"主楼建造"`
 	ProjectType         string `json:"type" example:"消防"`
 	UserID              int64  `json:"user_id" example:"1"`
+	Nav                 string `json:"nav" example:"工人"`
 }
 
 // WorkWrapper 工作请求wrapper
@@ -65,6 +66,17 @@ type BaoWorkReturn struct {
 	BaoWorkOther
 }
 
+// TujiWorkReturn 突击队作为返回值
+type TujiWorkReturn struct {
+	ID int64 `json:"work_id"`
+	BasicWork
+	PricingMode         string              `json:"pricing_mode"`
+	PublishTime         int64               `json:"publish_time"`
+	Treatment           []string            `json:"final_treatment"`
+	LocationInfoWrapper LocationInfoWrapper `json:"location_info"`
+	TujiWorkOther
+}
+
 // DianWorkOther 点工额外信息
 type DianWorkOther struct {
 	RequireNum string `json:"required_people" example:"11"`
@@ -103,4 +115,25 @@ type BaoWorkWrapper struct {
 type BaoWork struct {
 	ID int64
 	BaoWorkOther
+}
+
+// TujiWorkOther 突击队额外信息
+type TujiWorkOther struct {
+	Num       int64  `json:"required_people" example:"12"`
+	StartDate string `json:"work_date" example:"2019-05-12"`
+	Days      int64  `json:"work_days" example:"10"`
+	Time      string `json:"work_time" example:"8"`
+	Money     int64  `json:"money" example:"80"`
+}
+
+// TujiWorkWrapper 突击队
+type TujiWorkWrapper struct {
+	WorkWrapper
+	TujiWorkOther
+}
+
+// TujiWork 突击队有id
+type TujiWork struct {
+	ID int64
+	TujiWorkOther
 }

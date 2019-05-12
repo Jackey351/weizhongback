@@ -9,7 +9,22 @@ definitions:
       status:
         type: integer
     type: object
-  model.DianWorkWrapper:
+  model.LocationInfoWrapper:
+    properties:
+      addr:
+        example: 湖北省襄阳市樊城区武商广场店对面人民公园
+        type: string
+      latitude:
+        example: "32.04278"
+        type: string
+      longitude:
+        example: "112.15519"
+        type: string
+      title:
+        example: 人民广场
+        type: string
+    type: object
+  model.TujiWorkWrapper:
     properties:
       construction_company:
         example: 飞燕工程队
@@ -27,11 +42,11 @@ definitions:
       location_info:
         $ref: '#/definitions/model.LocationInfoWrapper'
         type: object
-      max_wage:
-        example: "200"
-        type: string
-      min_wage:
-        example: "100"
+      money:
+        example: 80
+        type: integer
+      nav:
+        example: 工人
         type: string
       need:
         example: 钢筋工
@@ -40,31 +55,22 @@ definitions:
         example: 主楼建造
         type: string
       required_people:
-        example: "11"
-        type: string
-      settlement:
-        example: 月薪
-        type: string
+        example: 12
+        type: integer
       type:
         example: 消防
         type: string
       user_id:
         example: 1
         type: integer
-    type: object
-  model.LocationInfoWrapper:
-    properties:
-      addr:
-        example: 湖北省襄阳市樊城区武商广场店对面人民公园
+      work_date:
+        example: "2019-05-12"
         type: string
-      latitude:
-        example: "32.04278"
-        type: string
-      longitude:
-        example: "112.15519"
-        type: string
-      title:
-        example: 人民广场
+      work_days:
+        example: 10
+        type: integer
+      work_time:
+        example: "8"
         type: string
     type: object
   model.WxUserWrapper:
@@ -168,7 +174,7 @@ paths:
       - application/json
       description: 发布工作
       parameters:
-      - description: 工种 0(点工),1(包工) 必填
+      - description: 工种 0(点工),1(包工),2(突击队) 必填
         in: query
         name: type
         required: true
@@ -177,7 +183,7 @@ paths:
         in: body
         name: 点工示例数据
         schema:
-          $ref: '#/definitions/model.DianWorkWrapper'
+          $ref: '#/definitions/model.TujiWorkWrapper'
           type: object
       produces:
       - application/json

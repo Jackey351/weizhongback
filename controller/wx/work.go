@@ -16,8 +16,8 @@ import (
 // @Summary 发布工作
 // @Description 发布工作
 // @Tags wx
-// @Param type query string true "工种 0(点工),1(包工) 必填"
-// @Param 点工示例数据 body model.DianWorkWrapper false "点工招聘"
+// @Param type query string true "工种 0(点工),1(包工),2(突击队) 必填"
+// @Param 点工示例数据 body model.TujiWorkWrapper false "点工招聘"
 // @Accept json
 // @Produce json
 // @Success 200 {object} controller.Message
@@ -25,13 +25,19 @@ import (
 func PublishWork(c *gin.Context) {
 	priceType := c.Query("type")
 
-	if common.FuncHandler(c, priceType == "0" || priceType == "1", true, 20001) {
+	if common.FuncHandler(c, priceType == "0" || priceType == "1" || priceType == "2", true, 20001) {
 		return
 	}
 
-	if priceType == "0" {
+	switch priceType {
+	case "0":
 		var workWrapper model.DianWorkWrapper
 		if common.FuncHandler(c, c.BindJSON(&workWrapper), nil, 20001) {
+			return
+		}
+
+		// 检查工种和工程类别是否正确
+		if common.FuncHandler(c, workWrapper.Nav == "工人" || workWrapper.Nav == "班组", true, 20001) {
 			return
 		}
 
@@ -98,9 +104,17 @@ func PublishWork(c *gin.Context) {
 		c.JSON(http.StatusOK, controller.Message{
 			Data: "发布成功",
 		})
-	} else {
+
+		break
+
+	case "1":
 		var workWrapper model.BaoWorkWrapper
 		if common.FuncHandler(c, c.BindJSON(&workWrapper), nil, 20001) {
+			return
+		}
+
+		// 检查工种和工程类别是否正确
+		if common.FuncHandler(c, workWrapper.Nav == "工人" || workWrapper.Nav == "班组", true, 20001) {
 			return
 		}
 
@@ -167,6 +181,81 @@ func PublishWork(c *gin.Context) {
 		c.JSON(http.StatusOK, controller.Message{
 			Msg: "发布成功",
 		})
+		break
+	case "2":
+		var workWrapper model.TujiWorkWrapper
+		if common.FuncHandler(c, c.BindJSON(&workWrapper), nil, 20001) {
+			return
+		}
+
+		if common.FuncHandler(c, workWrapper.Nav == "突击队", true, 20001) {
+			return
+		}
+
+		db := common.GetMySQL()
+
+		// 检查工种和工程类别是否正确
+		projectType := workWrapper.BasicWork.ProjectType
+		workerType := workWrapper.BasicWork.WorkerType
+
+		var res model.ProjectType
+		err := db.Where("name = ?", projectType).First(&res).Error
+		// 找不到数据
+		if common.FuncHandler(c, err, nil, 30000) {
+			return
+		}
+
+		var res2 model.WorkerType
+		err = db.Where("name = ?", workerType).First(&res2).Error
+		// 找不到数据
+		if common.FuncHandler(c, err, nil, 30001) {
+			return
+		}
+
+		var tujiWork model.TujiWork
+		tujiWork.TujiWorkOther = workWrapper.TujiWorkOther
+
+		tx := db.Begin()
+
+		err = tx.Create(&tujiWork).Error
+		// 数据库错误
+		if common.FuncHandler(c, err, nil, 20002) {
+			// 发生错误时回滚事务
+			tx.Rollback()
+			return
+		}
+
+		var locationInfo model.LocationInfo
+		locationInfo.LocationInfoWrapper = workWrapper.WorkWrapper.LocationInfoWrapper
+		err = tx.Create(&locationInfo).Error
+		// 数据库错误
+		if common.FuncHandler(c, err, nil, 20002) {
+			// 发生错误时回滚事务
+			tx.Rollback()
+			return
+		}
+
+		var work model.Work
+		work.BasicWork = workWrapper.WorkWrapper.BasicWork
+		work.LocationID = locationInfo.ID
+		work.Treatment = strings.Join(workWrapper.WorkWrapper.Treatment, ",")
+		work.Fid = tujiWork.ID
+		work.PricingMode = "突击队"
+		work.PublishTime = time.Now().Unix()
+
+		err = tx.Create(&work).Error
+		// 数据库错误
+		if common.FuncHandler(c, err, nil, 20002) {
+			// 发生错误时回滚事务
+			tx.Rollback()
+			return
+		}
+
+		tx.Commit()
+		c.JSON(http.StatusOK, controller.Message{
+			Msg: "发布成功",
+		})
+		break
 	}
 
 }
@@ -250,7 +339,8 @@ func SearchWork(c *gin.Context) {
 		var mWork []interface{}
 
 		for _, work := range works {
-			if work.PricingMode == "点工" {
+			switch work.PricingMode {
+			case "点工":
 				var dianWorkRet model.DianWorkReturn
 				dianWorkRet.ID = work.ID
 				dianWorkRet.BasicWork = work.BasicWork
@@ -278,7 +368,10 @@ func SearchWork(c *gin.Context) {
 				dianWorkRet.DianWorkOther = dianWork.DianWorkOther
 
 				mWork = append(mWork, dianWorkRet)
-			} else {
+
+				break
+
+			case "包工":
 				var baoWorkRet model.BaoWorkReturn
 				baoWorkRet.ID = work.ID
 				baoWorkRet.BasicWork = work.BasicWork
@@ -306,7 +399,38 @@ func SearchWork(c *gin.Context) {
 				baoWorkRet.BaoWorkOther = baoWork.BaoWorkOther
 
 				mWork = append(mWork, baoWorkRet)
+				break
+			case "突击队":
+				var tujiWorkRet model.TujiWorkReturn
+				tujiWorkRet.ID = work.ID
+				tujiWorkRet.BasicWork = work.BasicWork
+				tujiWorkRet.Treatment = strings.Split(work.Treatment, ",")
+				tujiWorkRet.PricingMode = work.PricingMode
+				tujiWorkRet.PublishTime = work.PublishTime
+
+				locationID := work.LocationID
+				tujiID := work.Fid
+
+				var locationInfo model.LocationInfo
+				err := db.First(&locationInfo, locationID).Error
+				// 找不到数据
+				if common.FuncHandler(c, err, nil, 20002) {
+					return
+				}
+				tujiWorkRet.LocationInfoWrapper = locationInfo.LocationInfoWrapper
+
+				var tujiWork model.TujiWork
+				err = db.First(&tujiWork, tujiID).Error
+				// 找不到数据
+				if common.FuncHandler(c, err, nil, 20002) {
+					return
+				}
+				tujiWorkRet.TujiWorkOther = tujiWork.TujiWorkOther
+
+				mWork = append(mWork, tujiWorkRet)
+				break
 			}
+
 		}
 
 		var ret map[string]interface{}
