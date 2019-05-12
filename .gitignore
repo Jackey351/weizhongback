@@ -12,3 +12,5 @@ conf/config\.yml
 vendor/
 
 tmp/
+
+main
