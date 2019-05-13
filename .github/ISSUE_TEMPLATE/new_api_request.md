@@ -1,7 +1,7 @@
 ---
 name: API需求
 about: 新API需求
-title: "[BUG]"
+title: "[NEW API]"
 labels: new api
 assignees: LogicJake
 
