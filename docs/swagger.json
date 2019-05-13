@@ -130,7 +130,7 @@
                     {
                         "type": "string",
                         "description": "工种 0(点工),1(包工),2(突击队) 必填",
-                        "name": "type",
+                        "name": "work_type",
                         "in": "query",
                         "required": true
                     },

@@ -173,7 +173,7 @@ paths:
       parameters:
       - description: 工种 0(点工),1(包工),2(突击队) 必填
         in: query
-        name: type
+        name: work_type
         required: true
         type: string
       - description: 点工招聘
