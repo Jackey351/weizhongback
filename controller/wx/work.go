@@ -267,6 +267,7 @@ func PublishWork(c *gin.Context) {
 // @Param location query string false "二级位置信息 选填"
 // @Param need query string false "所需工种 选填"
 // @Param type query string false "工程类别 选填"
+// @Param work_type query string false "工作类别 选填0只返回点工和包工，1只返回突击队，默认为0"
 // @Param page query string true "页码，从1开始 必填"
 // @Param limit query string true "每页记录数 必填"
 // @Produce json
@@ -276,6 +277,7 @@ func SearchWork(c *gin.Context) {
 	projectType := c.Query("type")
 	need := c.Query("need")
 	location := c.Query("location")
+	workType := c.Query("work_type")
 
 	page, err := strconv.Atoi(c.Query("page"))
 	if common.FuncHandler(c, err, nil, 20001) {
@@ -315,7 +317,13 @@ func SearchWork(c *gin.Context) {
 	}
 
 	if location != "" {
-		dbsearch = dbsearch.Where("location = ? ", location)
+		dbsearch = dbsearch.Where("location = ?", location)
+	}
+
+	if workType == "1" {
+		dbsearch = dbsearch.Where("pricing_mode = ?", "突击队")
+	} else {
+		dbsearch = dbsearch.Where("pricing_mode = ? OR pricing_mode = ?", "点工", "包工")
 	}
 
 	var works []model.Work

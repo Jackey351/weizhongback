@@ -186,6 +186,12 @@
                     },
                     {
                         "type": "string",
+                        "description": "工作类别 选填0只返回点工和包工，1只返回突击队，默认为0",
+                        "name": "work_type",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
                         "description": "页码，从1开始 必填",
                         "name": "page",
                         "in": "query",
