@@ -1,6 +1,6 @@
 ---
 name: 🍭 功能需求
-about: 提交新的功能需求
+about: 针对已有api提交新的功能需求
 title: "[FEATURE]"
 labels: enhancement
 assignees: LogicJake
