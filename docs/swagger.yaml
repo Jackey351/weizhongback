@@ -84,6 +84,9 @@ definitions:
       sex:
         example: 男
         type: string
+      wx_id:
+        example: jajsjasja11233
+        type: string
     type: object
 host: '{{.Host}}'
 info:

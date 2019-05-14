@@ -334,6 +334,10 @@
                 "sex": {
                     "type": "string",
                     "example": "男"
+                },
+                "wx_id": {
+                    "type": "string",
+                    "example": "jajsjasja11233"
                 }
             }
         }

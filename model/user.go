@@ -7,6 +7,7 @@ type WxUserWrapper struct {
 	Sex      string `json:"sex" example:"男"`
 	Hometown string `json:"hometown" example:"江苏"`
 	Phone    string `json:"phone" example:"133333"`
+	WxID     string `json:"wx_id" example:"jajsjasja11233"`
 }
 
 // WxUser 小程序用户信息
