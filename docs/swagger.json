@@ -265,10 +265,6 @@
                     "type": "string",
                     "example": "100"
                 },
-                "nav": {
-                    "type": "string",
-                    "example": "工人"
-                },
                 "need": {
                     "type": "string",
                     "example": "钢筋工"

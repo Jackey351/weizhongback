@@ -33,9 +33,6 @@ definitions:
       min_wage:
         example: "100"
         type: string
-      nav:
-        example: 工人
-        type: string
       need:
         example: 钢筋工
         type: string

@@ -36,11 +36,6 @@ func PublishWork(c *gin.Context) {
 			return
 		}
 
-		// 检查工种和工程类别是否正确
-		if common.FuncHandler(c, workWrapper.Nav == "工人" || workWrapper.Nav == "班组", true, 20001) {
-			return
-		}
-
 		db := common.GetMySQL()
 
 		// 检查工种和工程类别是否正确
@@ -113,11 +108,6 @@ func PublishWork(c *gin.Context) {
 			return
 		}
 
-		// 检查工种和工程类别是否正确
-		if common.FuncHandler(c, workWrapper.Nav == "工人" || workWrapper.Nav == "班组", true, 20001) {
-			return
-		}
-
 		db := common.GetMySQL()
 
 		// 检查工种和工程类别是否正确
@@ -185,10 +175,6 @@ func PublishWork(c *gin.Context) {
 	case "2":
 		var workWrapper model.TujiWorkWrapper
 		if common.FuncHandler(c, c.BindJSON(&workWrapper), nil, 20001) {
-			return
-		}
-
-		if common.FuncHandler(c, workWrapper.Nav == "突击队", true, 20001) {
 			return
 		}
 
