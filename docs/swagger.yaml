@@ -52,6 +52,13 @@ definitions:
         example: 1
         type: integer
     type: object
+  model.GroupRequest:
+    properties:
+      group_name:
+        type: string
+      uid:
+        type: integer
+    type: object
   model.LocationInfoWrapper:
     properties:
       addr:
@@ -112,6 +119,30 @@ paths:
       summary: PING-PONG
       tags:
       - miscellaneous
+  /wx/group/new_group:
+    post:
+      consumes:
+      - application/json
+      description: 创建新群组
+      parameters:
+      - description: create a new group
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.GroupRequest'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.Message'
+            type: object
+      summary: 创建新群组
+      tags:
+      - wx
   /wx/info/project_types:
     get:
       description: 获取所有工程类别
