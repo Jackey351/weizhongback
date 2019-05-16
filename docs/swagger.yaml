@@ -56,7 +56,7 @@ definitions:
     properties:
       group_name:
         type: string
-      uid:
+      user_id:
         type: integer
     type: object
   model.LocationInfoWrapper:
@@ -119,6 +119,33 @@ paths:
       summary: PING-PONG
       tags:
       - miscellaneous
+  /wx/group/join_group:
+    get:
+      consumes:
+      - application/json
+      description: 加入群组
+      parameters:
+      - description: 用户id
+        in: query
+        name: user_id
+        required: true
+        type: string
+      - description: 群组入群口令
+        in: query
+        name: group_key
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.Message'
+            type: object
+      summary: 加入群组
+      tags:
+      - wx
   /wx/group/new_group:
     post:
       consumes:

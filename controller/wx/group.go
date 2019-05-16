@@ -3,6 +3,7 @@ package wx
 import (
 	"math/rand"
 	"net/http"
+	"strconv"
 	"time"
 	"yanfei_backend/common"
 	"yanfei_backend/controller"
@@ -86,5 +87,66 @@ func NewGroup(c *gin.Context) {
 
 	c.JSON(http.StatusOK, controller.Message{
 		Data: newGroup,
+	})
+}
+
+// JoinGroup 加入群组
+// @Summary 加入群组
+// @Description 加入群组
+// @Tags wx
+// @Param user_id query string true "用户id"
+// @Param group_key query string true "群组入群口令"
+// @Accept json
+// @Produce json
+// @Success 200 {object} controller.Message
+// @Router /wx/group/join_group [get]
+func JoinGroup(c *gin.Context) {
+	userID, err := strconv.ParseInt(c.Query("user_id"), 10, 64)
+	if common.FuncHandler(c, err, nil, 20001) {
+		return
+	}
+	groupKey := c.Query("group_key")
+
+	db := common.GetMySQL()
+	// 检查userID是否存在
+	var existUser model.WxUser
+	db.First(&existUser, userID)
+	if common.FuncHandler(c, existUser.ID != 0, true, 40000) {
+		return
+	}
+
+	// 检查groupKey是否存在
+	var existGroup model.Group
+	db.Where("group_key = ?", groupKey).First(&existGroup)
+	if common.FuncHandler(c, existGroup.ID != 0, true, 50000) {
+		return
+	}
+
+	groupID := existGroup.ID
+	// 检查是否已经在群组
+	var existGroupMember model.GroupMember
+	db.Where("group_id = ? AND member_id = ?", groupID, userID).First(&existGroupMember)
+	if common.FuncHandler(c, existGroupMember.ID == 0, true, 50001) {
+		return
+	}
+
+	var newGroupMember model.GroupMember
+	newGroupMember.MemberID = userID
+	newGroupMember.GroupID = groupID
+
+	tx := db.Begin()
+
+	err = tx.Create(&newGroupMember).Error
+	// 数据库错误
+	if common.FuncHandler(c, err, nil, 20002) {
+		// 发生错误时回滚事务
+		tx.Rollback()
+		return
+	}
+
+	tx.Commit()
+
+	c.JSON(http.StatusOK, controller.Message{
+		Data: "加入群组成功",
 	})
 }

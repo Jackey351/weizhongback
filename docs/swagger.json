@@ -34,6 +34,46 @@
                 }
             }
         },
+        "/wx/group/join_group": {
+            "get": {
+                "description": "加入群组",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "wx"
+                ],
+                "summary": "加入群组",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "用户id",
+                        "name": "user_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "群组入群口令",
+                        "name": "group_key",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/controller.Message"
+                        }
+                    }
+                }
+            }
+        },
         "/wx/group/new_group": {
             "post": {
                 "description": "创建新群组",
@@ -333,7 +373,7 @@
                 "group_name": {
                     "type": "string"
                 },
-                "uid": {
+                "user_id": {
                     "type": "integer"
                 }
             }
