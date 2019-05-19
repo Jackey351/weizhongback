@@ -27,3 +27,9 @@ type GroupMember struct {
 	GroupID  int64 `json:"group_id"`
 	MemberID int64 `json:"member_id"`
 }
+
+// GroupMemberInfo 群组成员详细信息
+type GroupMemberInfo struct {
+	WxUser
+	IsOwner bool `json:"is_owner"`
+}

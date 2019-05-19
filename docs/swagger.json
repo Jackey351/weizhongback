@@ -34,6 +34,39 @@
                 }
             }
         },
+        "/wx/group/group_member": {
+            "get": {
+                "description": "班组所有成员",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "wx"
+                ],
+                "summary": "班组所有成员",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "班组id",
+                        "name": "group_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/controller.Message"
+                        }
+                    }
+                }
+            }
+        },
         "/wx/group/in_group": {
             "get": {
                 "description": "查询自己参与的班组，包括自己创建和加入的",

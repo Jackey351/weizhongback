@@ -119,6 +119,28 @@ paths:
       summary: PING-PONG
       tags:
       - miscellaneous
+  /wx/group/group_member:
+    get:
+      consumes:
+      - application/json
+      description: 班组所有成员
+      parameters:
+      - description: 班组id
+        in: query
+        name: group_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.Message'
+            type: object
+      summary: 班组所有成员
+      tags:
+      - wx
   /wx/group/in_group:
     get:
       consumes:

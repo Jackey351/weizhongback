@@ -229,3 +229,65 @@ func InGroup(c *gin.Context) {
 		Data: groupInfos,
 	})
 }
+
+// GroupMember 班组所有成员
+// @Summary 班组所有成员
+// @Description 班组所有成员
+// @Tags wx
+// @Param group_id query string true "班组id"
+// @Accept json
+// @Produce json
+// @Success 200 {object} controller.Message
+// @Router /wx/group/group_member [get]
+func GroupMember(c *gin.Context) {
+	groupID, err := strconv.ParseInt(c.Query("group_id"), 10, 64)
+	if common.FuncHandler(c, err, nil, 20001) {
+		return
+	}
+
+	db := common.GetMySQL()
+	var groupMemberInfos []model.GroupMemberInfo
+
+	// 群主信息
+	var group model.Group
+	err = db.First(&group, groupID).Error
+	// 找不到数据
+	if common.FuncHandler(c, err, nil, 20002) {
+		return
+	}
+
+	var user model.WxUser
+	err = db.First(&user, group.OwnerID).Error
+	// 找不到数据
+	if common.FuncHandler(c, err, nil, 20002) {
+		return
+	}
+	var groupMemberInfo model.GroupMemberInfo
+	groupMemberInfo.IsOwner = true
+	groupMemberInfo.WxUser = user
+	groupMemberInfos = append(groupMemberInfos, groupMemberInfo)
+
+	// 群成员信息
+	var groupMembers []model.GroupMember
+	err = db.Where("group_id = ?", groupID).Find(&groupMembers).Error
+	if err == nil {
+		for _, groupMember := range groupMembers {
+			memberID := groupMember.MemberID
+
+			var user model.WxUser
+			err = db.First(&user, memberID).Error
+			// 找不到数据
+			if common.FuncHandler(c, err, nil, 20002) {
+				return
+			}
+			var groupMemberInfo model.GroupMemberInfo
+			groupMemberInfo.IsOwner = false
+			groupMemberInfo.WxUser = user
+			groupMemberInfos = append(groupMemberInfos, groupMemberInfo)
+		}
+	}
+
+	c.JSON(http.StatusOK, controller.Message{
+		Data: groupMemberInfos,
+	})
+}
