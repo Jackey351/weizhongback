@@ -355,6 +355,36 @@ paths:
       summary: 添加分项记录
       tags:
       - 工作记录
+  /wx/record/check_recorded:
+    get:
+      description: 检查某日是否记录
+      parameters:
+      - description: 班组id
+        in: query
+        name: group_id
+        required: true
+        type: integer
+      - description: 工人id
+        in: query
+        name: worker_id
+        required: true
+        type: integer
+      - description: 日期
+        in: query
+        name: date
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.Message'
+            type: object
+      summary: 检查某日是否记录
+      tags:
+      - 工作记录
   /wx/user/new_user:
     post:
       consumes:

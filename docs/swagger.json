@@ -324,6 +324,50 @@
                 }
             }
         },
+        "/wx/record/check_recorded": {
+            "get": {
+                "description": "检查某日是否记录",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "工作记录"
+                ],
+                "summary": "检查某日是否记录",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "班组id",
+                        "name": "group_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "工人id",
+                        "name": "worker_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "日期",
+                        "name": "date",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/controller.Message"
+                        }
+                    }
+                }
+            }
+        },
         "/wx/user/new_user": {
             "post": {
                 "description": "小程序端新添用户",

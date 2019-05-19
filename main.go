@@ -82,6 +82,7 @@ func main() {
 	// 工作记录相关
 	r.POST("/wx/record/add_hour_record", wx.AddHourRecord)
 	r.POST("/wx/record/add_item_record", wx.AddItemRecord)
+	r.GET("/wx/record/check_recorded", wx.CheckRecorded)
 
 	r.Run("0.0.0.0:" + viper.GetString("basic.port"))
 }
