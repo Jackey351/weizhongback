@@ -69,7 +69,7 @@ func NewGroup(c *gin.Context) {
 
 	var newGroup model.Group
 	newGroup.GroupName = groupReq.GroupName
-	newGroup.UID = groupReq.UID
+	newGroup.OwnerID = groupReq.OwnerID
 	newGroup.GroupKey = NewGroupKey()
 
 	db := common.GetMySQL()
@@ -148,5 +148,84 @@ func JoinGroup(c *gin.Context) {
 
 	c.JSON(http.StatusOK, controller.Message{
 		Data: "加入群组成功",
+	})
+}
+
+// InGroup 查询自己参与的班组
+// @Summary 查询自己参与的班组
+// @Description 查询自己参与的班组，包括自己创建和加入的
+// @Tags wx
+// @Param user_id query string true "用户id"
+// @Accept json
+// @Produce json
+// @Success 200 {object} controller.Message
+// @Router /wx/group/in_group [get]
+func InGroup(c *gin.Context) {
+	userID, err := strconv.ParseInt(c.Query("user_id"), 10, 64)
+	if common.FuncHandler(c, err, nil, 20001) {
+		return
+	}
+
+	db := common.GetMySQL()
+	var groupInfos []model.GroupInfo
+
+	// 查询自己创建的群组
+	var groups []model.Group
+	err = db.Where("owner_id = ?", userID).Find(&groups).Error
+
+	if err == nil {
+		for _, group := range groups {
+			var groupInfo model.GroupInfo
+			groupInfo.ID = group.ID
+			groupInfo.GroupName = group.GroupName
+			groupInfo.IsOwner = true
+			ownerID := group.OwnerID
+
+			var owner model.WxUser
+			err = db.First(&owner, ownerID).Error
+			// 找不到数据
+			if common.FuncHandler(c, err, nil, 20002) {
+				return
+			}
+
+			groupInfo.Owner = owner
+			groupInfos = append(groupInfos, groupInfo)
+		}
+	}
+	// 查询自己参与的群组
+	var groupMembers []model.GroupMember
+	err = db.Where("member_id = ?", userID).Find(&groupMembers).Error
+
+	if err == nil {
+		for _, groupMember := range groupMembers {
+			groupID := groupMember.GroupID
+
+			var group model.Group
+			err = db.First(&group, groupID).Error
+			// 找不到数据
+			if common.FuncHandler(c, err, nil, 20002) {
+				return
+			}
+
+			var groupInfo model.GroupInfo
+			groupInfo.ID = group.ID
+			groupInfo.GroupName = group.GroupName
+			groupInfo.IsOwner = false
+			ownerID := group.OwnerID
+
+			var owner model.WxUser
+			err = db.First(&owner, ownerID).Error
+			// 找不到数据
+			if common.FuncHandler(c, err, nil, 20002) {
+				return
+			}
+
+			groupInfo.Owner = owner
+			groupInfos = append(groupInfos, groupInfo)
+		}
+	}
+
+	c.JSON(http.StatusOK, controller.Message{
+		Data: groupInfos,
 	})
 }

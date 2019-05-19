@@ -7,9 +7,17 @@ type Group struct {
 	GroupKey string `json:"group_key"`
 }
 
+// GroupInfo 详细的班组数据，多了创建者信息
+type GroupInfo struct {
+	ID        int64  `json:"id"`
+	GroupName string `json:"group_name"`
+	Owner     WxUser `json:"owner"`
+	IsOwner   bool   `json:"is_owner"`
+}
+
 // GroupRequest 群组请求字段
 type GroupRequest struct {
-	UID       int64  `json:"user_id"`
+	OwnerID   int64  `json:"owner_id"`
 	GroupName string `json:"group_name"`
 }
 

@@ -34,6 +34,39 @@
                 }
             }
         },
+        "/wx/group/in_group": {
+            "get": {
+                "description": "查询自己参与的班组，包括自己创建和加入的",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "wx"
+                ],
+                "summary": "查询自己参与的班组",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "用户id",
+                        "name": "user_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/controller.Message"
+                        }
+                    }
+                }
+            }
+        },
         "/wx/group/join_group": {
             "get": {
                 "description": "加入群组",
@@ -373,7 +406,7 @@
                 "group_name": {
                     "type": "string"
                 },
-                "user_id": {
+                "owner_id": {
                     "type": "integer"
                 }
             }
