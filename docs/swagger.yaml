@@ -59,6 +59,27 @@ definitions:
       owner_id:
         type: integer
     type: object
+  model.HourRecordRequest:
+    properties:
+      adder_id:
+        example: 1
+        type: integer
+      extra_work_hours:
+        example: 1
+        type: number
+      group_id:
+        example: 1
+        type: integer
+      record_date:
+        example: "2019-05-19"
+        type: string
+      work_hours:
+        example: 1.5
+        type: number
+      worker_id:
+        example: 2
+        type: integer
+    type: object
   model.LocationInfoWrapper:
     properties:
       addr:
@@ -269,6 +290,28 @@ paths:
       summary: 获取所有工种
       tags:
       - wx
+  /wx/record/add_hour_record:
+    post:
+      description: 添加工时记录
+      parameters:
+      - description: 工时记录数据
+        in: body
+        name: 工时记录数据
+        required: true
+        schema:
+          $ref: '#/definitions/model.HourRecordRequest'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.Message'
+            type: object
+      summary: 添加工时记录
+      tags:
+      - 工时
   /wx/user/new_user:
     post:
       consumes:

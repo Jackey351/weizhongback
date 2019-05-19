@@ -79,6 +79,8 @@ func main() {
 	r.GET("/wx/group/in_group", wx.InGroup)
 	r.GET("/wx/group/group_member", wx.GroupMember)
 	r.GET("/wx/group/delete_member", wx.DeleteMember)
+	// 工作记录相关
+	r.POST("/wx/record/add_hour_record", wx.AddHourRecord)
 
 	r.Run("0.0.0.0:" + viper.GetString("basic.port"))
 }
