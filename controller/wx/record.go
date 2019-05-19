@@ -31,14 +31,31 @@ func AddHourRecord(c *gin.Context) {
 		return
 	}
 
+	if _, ok := UserExist(c, hourRecordRequest.WorkerID).(model.WxUser); !ok {
+		return
+	}
+	if _, ok := UserExist(c, hourRecordRequest.AdderID).(model.WxUser); !ok {
+		return
+	}
+	if _, ok := GroupExistByID(c, hourRecordRequest.GroupID).(model.Group); !ok {
+		return
+	}
+
 	var hourRecord model.HourRecord
 	hourRecord.WorkHours = hourRecordRequest.WorkHours
 	hourRecord.ExtraWorkHours = hourRecordRequest.ExtraWorkHours
 
 	db := common.GetMySQL()
+
+	var existRecord model.Record
+	err := db.Where("group_id = ? AND worker_id = ? AND record_date = ? AND record_type = ?", hourRecordRequest.GroupID, hourRecordRequest.WorkerID, hourRecordRequest.RecordDate, HourRecord).First(&existRecord).Error
+	if common.FuncHandler(c, err != nil, true, common.RecordHasExist) {
+		return
+	}
+
 	tx := db.Begin()
 
-	err := tx.Create(&hourRecord).Error
+	err = tx.Create(&hourRecord).Error
 	// 数据库错误
 	if common.FuncHandler(c, err, nil, common.DatabaseError) {
 		// 发生错误时回滚事务
@@ -80,14 +97,31 @@ func AddItemRecord(c *gin.Context) {
 		return
 	}
 
+	if _, ok := UserExist(c, itemRecordRequest.WorkerID).(model.WxUser); !ok {
+		return
+	}
+	if _, ok := UserExist(c, itemRecordRequest.AdderID).(model.WxUser); !ok {
+		return
+	}
+	if _, ok := GroupExistByID(c, itemRecordRequest.GroupID).(model.Group); !ok {
+		return
+	}
+
 	var itemRecord model.ItemRecord
 	itemRecord.Subitem = itemRecordRequest.Subitem
 	itemRecord.Quantity = itemRecordRequest.Quantity
 
 	db := common.GetMySQL()
+
+	var existRecord model.Record
+	err := db.Where("group_id = ? AND worker_id = ? AND record_date = ? AND record_type = ?", itemRecordRequest.GroupID, itemRecordRequest.WorkerID, itemRecordRequest.RecordDate, ItemRecord).First(&existRecord).Error
+	if common.FuncHandler(c, err != nil, true, common.RecordHasExist) {
+		return
+	}
+
 	tx := db.Begin()
 
-	err := tx.Create(&itemRecord).Error
+	err = tx.Create(&itemRecord).Error
 	// 数据库错误
 	if common.FuncHandler(c, err, nil, common.DatabaseError) {
 		// 发生错误时回滚事务
@@ -140,47 +174,58 @@ func CheckRecorded(c *gin.Context) {
 	}
 	date := c.Query("date")
 
-	var record model.Record
+	if _, ok := UserExist(c, workerID).(model.WxUser); !ok {
+		return
+	}
+	if _, ok := GroupExistByID(c, groupID).(model.Group); !ok {
+		return
+	}
+
+	var records []model.Record
 	db := common.GetMySQL()
 
-	err = db.Where("group_id = ? AND worker_id = ? AND record_date = ?", groupID, workerID, date).First(&record).Error
+	err = db.Where("group_id = ? AND worker_id = ? AND record_date = ?", groupID, workerID, date).Find(&records).Error
 
 	if err == nil {
-		switch record.RecordType {
-		case HourRecord:
-			var hourRecordRequest model.HourRecordRequest
-			hourRecordRequest.CommonRecord = record.CommonRecord
+		var returnRecords []interface{}
+		for _, record := range records {
+			switch record.RecordType {
+			case HourRecord:
+				var hourRecordRequest model.HourRecordRequest
+				hourRecordRequest.CommonRecord = record.CommonRecord
 
-			var hourRecord model.HourRecord
-			err = db.First(&hourRecord, record.RecordID).Error
-			if common.FuncHandler(c, err, nil, common.DatabaseError) {
-				return
+				var hourRecord model.HourRecord
+				err = db.First(&hourRecord, record.RecordID).Error
+				if common.FuncHandler(c, err, nil, common.DatabaseError) {
+					return
+				}
+
+				hourRecordRequest.WorkHours = hourRecord.WorkHours
+				hourRecordRequest.ExtraWorkHours = hourRecord.ExtraWorkHours
+
+				returnRecords = append(returnRecords, hourRecordRequest)
+				break
+			case ItemRecord:
+				var itemRecordRequest model.ItemRecordRequest
+				itemRecordRequest.CommonRecord = record.CommonRecord
+
+				var itemRecord model.ItemRecord
+				err = db.First(&itemRecord, record.RecordID).Error
+				if common.FuncHandler(c, err, nil, common.DatabaseError) {
+					return
+				}
+
+				itemRecordRequest.Subitem = itemRecord.Subitem
+				itemRecordRequest.Quantity = itemRecord.Quantity
+
+				returnRecords = append(returnRecords, itemRecordRequest)
+				break
+
 			}
-
-			hourRecordRequest.WorkHours = hourRecord.WorkHours
-			hourRecordRequest.ExtraWorkHours = hourRecord.ExtraWorkHours
-			c.JSON(http.StatusOK, controller.Message{
-				Data: hourRecordRequest,
-			})
-			break
-		case ItemRecord:
-			var itemRecordRequest model.ItemRecordRequest
-			itemRecordRequest.CommonRecord = record.CommonRecord
-
-			var itemRecord model.ItemRecord
-			err = db.First(&itemRecord, record.RecordID).Error
-			if common.FuncHandler(c, err, nil, common.DatabaseError) {
-				return
-			}
-
-			itemRecordRequest.Subitem = itemRecord.Subitem
-			itemRecordRequest.Quantity = itemRecord.Quantity
-			c.JSON(http.StatusOK, controller.Message{
-				Data: itemRecordRequest,
-			})
-			break
-
 		}
+		c.JSON(http.StatusOK, controller.Message{
+			Data: returnRecords,
+		})
 	} else {
 		c.JSON(http.StatusOK, controller.Message{
 			Msg: "无记录",

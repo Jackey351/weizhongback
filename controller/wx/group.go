@@ -67,6 +67,10 @@ func NewGroup(c *gin.Context) {
 		return
 	}
 
+	if _, ok := UserExist(c, groupReq.OwnerID).(model.WxUser); !ok {
+		return
+	}
+
 	var newGroup model.Group
 	newGroup.GroupName = groupReq.GroupName
 	newGroup.OwnerID = groupReq.OwnerID
@@ -90,6 +94,32 @@ func NewGroup(c *gin.Context) {
 	})
 }
 
+// GroupExistByID 根据班组id判断班组是否存在，不存在直接返回GroupNoExist
+func GroupExistByID(c *gin.Context, groupID int64) interface{} {
+	db := common.GetMySQL()
+
+	var existGroup model.Group
+	err := db.First(&existGroup, groupID).Error
+	if common.FuncHandler(c, err, nil, common.GroupNoExist) {
+		return false
+	}
+
+	return existGroup
+}
+
+// GroupExistByKey 根据班组key判断班组是否存在，不存在直接返回GroupNoExist
+func GroupExistByKey(c *gin.Context, groupKey string) interface{} {
+	db := common.GetMySQL()
+
+	var existGroup model.Group
+	err := db.Where("group_key = ?", groupKey).First(&existGroup).Error
+	if common.FuncHandler(c, err, nil, common.GroupNoExist) {
+		return false
+	}
+
+	return existGroup
+}
+
 // JoinGroup 加入班组
 // @Summary 加入班组
 // @Description 加入班组
@@ -107,27 +137,29 @@ func JoinGroup(c *gin.Context) {
 	}
 	groupKey := c.Query("group_key")
 
-	db := common.GetMySQL()
 	// 检查userID是否存在
-	var existUser model.WxUser
-	err = db.First(&existUser, userID).Error
-	// 找不到数据
-	if common.FuncHandler(c, err, nil, common.DatabaseError) {
+	if _, ok := UserExist(c, userID).(model.WxUser); !ok {
 		return
 	}
 
 	// 检查groupKey是否存在
 	var existGroup model.Group
-	err = db.Where("group_key = ?", groupKey).First(&existGroup).Error
-	if common.FuncHandler(c, err, nil, common.DatabaseError) {
+	var ok bool
+	if existGroup, ok = GroupExistByKey(c, groupKey).(model.Group); !ok {
 		return
 	}
+
+	if common.FuncHandler(c, existGroup.OwnerID != userID, true, common.HasInGroup) {
+		return
+	}
+
+	db := common.GetMySQL()
 
 	groupID := existGroup.ID
 	// 检查是否已经在班组
 	var existGroupMember model.GroupMember
 	err = db.Where("group_id = ? AND member_id = ?", groupID, userID).First(&existGroupMember).Error
-	if common.FuncHandler(c, err, nil, common.DatabaseError) {
+	if common.FuncHandler(c, err != nil, true, common.HasInGroup) {
 		return
 	}
 
@@ -164,6 +196,11 @@ func JoinGroup(c *gin.Context) {
 func InGroup(c *gin.Context) {
 	userID, err := strconv.ParseInt(c.Query("user_id"), 10, 64)
 	if common.FuncHandler(c, err, nil, common.ParameterError) {
+		return
+	}
+
+	// 检查userID是否存在
+	if _, ok := UserExist(c, userID).(model.WxUser); !ok {
 		return
 	}
 
@@ -246,16 +283,14 @@ func GroupMember(c *gin.Context) {
 		return
 	}
 
-	db := common.GetMySQL()
-	var groupMemberRets []model.GroupMemberRet
-
-	// 群主信息
 	var group model.Group
-	err = db.First(&group, groupID).Error
-	// 找不到数据
-	if common.FuncHandler(c, err, nil, common.DatabaseError) {
+	var ok bool
+	if group, ok = GroupExistByID(c, groupID).(model.Group); !ok {
 		return
 	}
+
+	db := common.GetMySQL()
+	var groupMemberRets []model.GroupMemberRet
 
 	var user model.WxUser
 	err = db.First(&user, group.OwnerID).Error
@@ -314,6 +349,13 @@ func DeleteMember(c *gin.Context) {
 	}
 	userID, err = strconv.ParseInt(c.Query("user_id"), 10, 64)
 	if common.FuncHandler(c, err, nil, common.ParameterError) {
+		return
+	}
+
+	if _, ok := UserExist(c, userID).(model.WxUser); !ok {
+		return
+	}
+	if _, ok := GroupExistByID(c, groupID).(model.Group); !ok {
 		return
 	}
 

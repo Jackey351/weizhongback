@@ -134,8 +134,8 @@ func ErrorHandling() gin.HandlerFunc {
 			break
 		default:
 			c.JSON(http.StatusInternalServerError, gin.H{
-				"err_code": 10001,
-				"message":  Errors[10001],
+				"err_code": SystemError,
+				"message":  Errors[SystemError],
 			})
 			log.Println(c.ClientIP(), "SYSTEM ERROR")
 			raven.CaptureMessage(fmt.Sprintf("[%v] %v", 10001, Errors[10001]), map[string]string{"type": "system"})
@@ -164,6 +164,8 @@ const (
 
 	GroupNoExist = 40000
 	HasInGroup   = 40001
+
+	RecordHasExist = 50001
 )
 
 // Errors 错误码
@@ -190,4 +192,7 @@ var Errors = map[int]string{
 	// 群组相关
 	GroupNoExist: "不存在该群组",
 	HasInGroup:   "已在群组内",
+
+	// 工作记录相关
+	RecordHasExist: "该日已存在工作记录",
 }

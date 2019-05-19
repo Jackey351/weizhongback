@@ -36,6 +36,11 @@ func PublishDianWork(c *gin.Context) {
 
 	db := common.GetMySQL()
 
+	// 检查userID是否存在
+	if _, ok := UserExist(c, dianWorkReq.UserID).(model.WxUser); !ok {
+		return
+	}
+
 	// 检查工种和工程类别是否正确
 	projectType := dianWorkReq.BasicWork.ProjectType
 	workerType := dianWorkReq.BasicWork.WorkerType
@@ -115,6 +120,11 @@ func PublishBaoWork(c *gin.Context) {
 	}
 
 	db := common.GetMySQL()
+
+	// 检查userID是否存在
+	if _, ok := UserExist(c, baoWorkReq.UserID).(model.WxUser); !ok {
+		return
+	}
 
 	// 检查工种和工程类别是否正确
 	projectType := baoWorkReq.BasicWork.ProjectType
@@ -196,6 +206,11 @@ func PublishTujiWork(c *gin.Context) {
 	}
 
 	db := common.GetMySQL()
+
+	// 检查userID是否存在
+	if _, ok := UserExist(c, tujiWorkReq.UserID).(model.WxUser); !ok {
+		return
+	}
 
 	// 检查工种和工程类别是否正确
 	projectType := tujiWorkReq.BasicWork.ProjectType

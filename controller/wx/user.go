@@ -9,6 +9,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// UserExist 根据用户id判断用户是否存在，不存在直接返回UserNoExist
+func UserExist(c *gin.Context, userID int64) interface{} {
+	db := common.GetMySQL()
+
+	var existUser model.WxUser
+	err := db.First(&existUser, userID).Error
+	if common.FuncHandler(c, err, nil, common.UserNoExist) {
+		return false
+	}
+	return existUser
+}
+
 // NewWxUser 小程序新用户
 // @Summary 小程序端新添用户
 // @Description 小程序端新添用户
