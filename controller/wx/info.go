@@ -17,13 +17,13 @@ import (
 // @Success 200 {object} controller.Message
 // @Router /wx/info/worker_types [get]
 func GetWokerType(c *gin.Context) {
-	var types []model.WorkerType
+	var types []model.WorkType
 
 	db := common.GetMySQL()
 
 	err := db.Find(&types).Error
 	// 数据库错误
-	if common.FuncHandler(c, err, nil, 20002) {
+	if common.FuncHandler(c, err, nil, common.DatabaseError) {
 		return
 	}
 
@@ -46,7 +46,7 @@ func GetProjectType(c *gin.Context) {
 
 	err := db.Find(&types).Error
 	// 数据库错误
-	if common.FuncHandler(c, err, nil, 20002) {
+	if common.FuncHandler(c, err, nil, common.DatabaseError) {
 		return
 	}
 

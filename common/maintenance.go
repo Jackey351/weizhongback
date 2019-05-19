@@ -14,8 +14,8 @@ func MaintenanceHandling() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if viper.GetBool("basic.maintenance") {
 			c.JSON(http.StatusServiceUnavailable, gin.H{
-				"err_code": 10008,
-				"message":  Errors[10008],
+				"err_code": Maintenance,
+				"message":  Errors[Maintenance],
 			})
 			log.Println(c.ClientIP(), "Maintenance mode is on")
 			raven.CaptureMessage("Maintenance mode is on", map[string]string{"type": "maintenance"})

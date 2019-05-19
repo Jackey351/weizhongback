@@ -22,7 +22,7 @@ func NewWxUser(c *gin.Context) {
 	var newUserReq model.WxUserWrapper
 
 	// 获取数据失败
-	if common.FuncHandler(c, c.BindJSON(&newUserReq), nil, 20001) {
+	if common.FuncHandler(c, c.BindJSON(&newUserReq), nil, common.ParameterError) {
 		return
 	}
 
@@ -35,7 +35,7 @@ func NewWxUser(c *gin.Context) {
 
 	err := tx.Create(&newUser).Error
 	// 数据库错误
-	if common.FuncHandler(c, err, nil, 20002) {
+	if common.FuncHandler(c, err, nil, common.DatabaseError) {
 		// 发生错误时回滚事务
 		tx.Rollback()
 		return

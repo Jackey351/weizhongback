@@ -145,34 +145,48 @@ func ErrorHandling() gin.HandlerFunc {
 	}
 }
 
+// 错误码
+const (
+	OK = 0
+
+	SystemError         = 10001
+	DatabaseError       = 10002
+	ServiceUnavailable  = 10003
+	ParameterError      = 10004
+	ResourceUnavailable = 10005
+	CSRFError           = 10006
+	Maintenance         = 10007
+
+	ProjectTypeNoExist = 20000
+	WorkTypeNoExist    = 20001
+
+	UserNoExist = 30000
+
+	GroupNoExist = 40000
+	HasInGroup   = 40001
+)
+
 // Errors 错误码
 var Errors = map[int]string{
 
-	0: "OK",
+	OK: "OK",
 
 	// 系统级错误
-	10001: "System error",
-	10002: "Service unavailable",
-	10003: "Parameter error",
-	10004: "Parameter value invalid",
-	10005: "Missing required parameter",
-	10006: "Resource unavailable",
-	10007: "CSRF token mismatch",
-	10008: "This service is undergoing maintenance",
-
-	// 应用级错误
-	20000: "Application error",
-	20001: "参数错误",
-	20002: "数据库错误",
+	SystemError:         "System error",
+	ServiceUnavailable:  "Service unavailable",
+	ParameterError:      "Parameter error",
+	ResourceUnavailable: "Resource unavailable",
+	CSRFError:           "CSRF token mismatch",
+	Maintenance:         "This service is undergoing maintenance",
 
 	// 工作相关
-	30000: "不存在该工程类别",
-	30001: "不存在该工种",
+	ProjectTypeNoExist: "不存在该工程类别",
+	WorkTypeNoExist:    "不存在该工种",
 
 	// 用户相关
-	40000: "不存在该用户",
+	UserNoExist: "不存在该用户",
 
 	// 群组相关
-	50000: "不存在该群组",
-	50001: "已在群组内",
+	GroupNoExist: "不存在该群组",
+	HasInGroup:   "已在群组内",
 }

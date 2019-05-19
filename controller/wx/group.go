@@ -63,7 +63,7 @@ func NewGroup(c *gin.Context) {
 	var groupReq model.GroupRequest
 
 	// 获取数据失败
-	if common.FuncHandler(c, c.BindJSON(&groupReq), nil, 20001) {
+	if common.FuncHandler(c, c.BindJSON(&groupReq), nil, common.ParameterError) {
 		return
 	}
 
@@ -77,7 +77,7 @@ func NewGroup(c *gin.Context) {
 
 	err := tx.Create(&newGroup).Error
 	// 数据库错误
-	if common.FuncHandler(c, err, nil, 20002) {
+	if common.FuncHandler(c, err, nil, common.DatabaseError) {
 		// 发生错误时回滚事务
 		tx.Rollback()
 		return
@@ -102,7 +102,7 @@ func NewGroup(c *gin.Context) {
 // @Router /wx/group/join_group [get]
 func JoinGroup(c *gin.Context) {
 	userID, err := strconv.ParseInt(c.Query("user_id"), 10, 64)
-	if common.FuncHandler(c, err, nil, 20001) {
+	if common.FuncHandler(c, err, nil, common.ParameterError) {
 		return
 	}
 	groupKey := c.Query("group_key")
@@ -111,14 +111,14 @@ func JoinGroup(c *gin.Context) {
 	// 检查userID是否存在
 	var existUser model.WxUser
 	db.First(&existUser, userID)
-	if common.FuncHandler(c, existUser.ID != 0, true, 40000) {
+	if common.FuncHandler(c, existUser.ID != 0, true, common.UserNoExist) {
 		return
 	}
 
 	// 检查groupKey是否存在
 	var existGroup model.Group
 	db.Where("group_key = ?", groupKey).First(&existGroup)
-	if common.FuncHandler(c, existGroup.ID != 0, true, 50000) {
+	if common.FuncHandler(c, existGroup.ID != 0, true, common.GroupNoExist) {
 		return
 	}
 
@@ -126,7 +126,7 @@ func JoinGroup(c *gin.Context) {
 	// 检查是否已经在班组
 	var existGroupMember model.GroupMember
 	db.Where("group_id = ? AND member_id = ?", groupID, userID).First(&existGroupMember)
-	if common.FuncHandler(c, existGroupMember.ID == 0, true, 50001) {
+	if common.FuncHandler(c, existGroupMember.ID == 0, true, common.HasInGroup) {
 		return
 	}
 
@@ -138,7 +138,7 @@ func JoinGroup(c *gin.Context) {
 
 	err = tx.Create(&newGroupMember).Error
 	// 数据库错误
-	if common.FuncHandler(c, err, nil, 20002) {
+	if common.FuncHandler(c, err, nil, common.DatabaseError) {
 		// 发生错误时回滚事务
 		tx.Rollback()
 		return
@@ -162,7 +162,7 @@ func JoinGroup(c *gin.Context) {
 // @Router /wx/group/in_group [get]
 func InGroup(c *gin.Context) {
 	userID, err := strconv.ParseInt(c.Query("user_id"), 10, 64)
-	if common.FuncHandler(c, err, nil, 20001) {
+	if common.FuncHandler(c, err, nil, common.ParameterError) {
 		return
 	}
 
@@ -184,7 +184,7 @@ func InGroup(c *gin.Context) {
 			var owner model.WxUser
 			err = db.First(&owner, ownerID).Error
 			// 找不到数据
-			if common.FuncHandler(c, err, nil, 20002) {
+			if common.FuncHandler(c, err, nil, common.DatabaseError) {
 				return
 			}
 
@@ -203,7 +203,7 @@ func InGroup(c *gin.Context) {
 			var group model.Group
 			err = db.First(&group, groupID).Error
 			// 找不到数据
-			if common.FuncHandler(c, err, nil, 20002) {
+			if common.FuncHandler(c, err, nil, common.DatabaseError) {
 				return
 			}
 
@@ -216,7 +216,7 @@ func InGroup(c *gin.Context) {
 			var owner model.WxUser
 			err = db.First(&owner, ownerID).Error
 			// 找不到数据
-			if common.FuncHandler(c, err, nil, 20002) {
+			if common.FuncHandler(c, err, nil, common.DatabaseError) {
 				return
 			}
 
@@ -241,7 +241,7 @@ func InGroup(c *gin.Context) {
 // @Router /wx/group/group_member [get]
 func GroupMember(c *gin.Context) {
 	groupID, err := strconv.ParseInt(c.Query("group_id"), 10, 64)
-	if common.FuncHandler(c, err, nil, 20001) {
+	if common.FuncHandler(c, err, nil, common.ParameterError) {
 		return
 	}
 
@@ -252,14 +252,14 @@ func GroupMember(c *gin.Context) {
 	var group model.Group
 	err = db.First(&group, groupID).Error
 	// 找不到数据
-	if common.FuncHandler(c, err, nil, 20002) {
+	if common.FuncHandler(c, err, nil, common.DatabaseError) {
 		return
 	}
 
 	var user model.WxUser
 	err = db.First(&user, group.OwnerID).Error
 	// 找不到数据
-	if common.FuncHandler(c, err, nil, 20002) {
+	if common.FuncHandler(c, err, nil, common.DatabaseError) {
 		return
 	}
 	var groupMemberInfo model.GroupMemberInfo
@@ -277,7 +277,7 @@ func GroupMember(c *gin.Context) {
 			var user model.WxUser
 			err = db.First(&user, memberID).Error
 			// 找不到数据
-			if common.FuncHandler(c, err, nil, 20002) {
+			if common.FuncHandler(c, err, nil, common.DatabaseError) {
 				return
 			}
 			var groupMemberInfo model.GroupMemberInfo
@@ -308,11 +308,11 @@ func DeleteMember(c *gin.Context) {
 	var err error
 
 	groupID, err = strconv.ParseInt(c.Query("group_id"), 10, 64)
-	if common.FuncHandler(c, err, nil, 20001) {
+	if common.FuncHandler(c, err, nil, common.ParameterError) {
 		return
 	}
 	userID, err = strconv.ParseInt(c.Query("user_id"), 10, 64)
-	if common.FuncHandler(c, err, nil, 20001) {
+	if common.FuncHandler(c, err, nil, common.ParameterError) {
 		return
 	}
 
@@ -321,7 +321,7 @@ func DeleteMember(c *gin.Context) {
 
 	err = db.Delete(model.GroupMember{}, "group_id = ? AND member_id = ?", groupID, userID).Error
 
-	if common.FuncHandler(c, err, nil, 20002) {
+	if common.FuncHandler(c, err, nil, common.DatabaseError) {
 		tx.Rollback()
 		return
 	}

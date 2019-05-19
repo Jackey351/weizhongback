@@ -27,7 +27,7 @@ const (
 // @Router /wx/record/add_hour_record [post]
 func AddHourRecord(c *gin.Context) {
 	var hourRecordRequest model.HourRecordRequest
-	if common.FuncHandler(c, c.BindJSON(&hourRecordRequest), nil, 20001) {
+	if common.FuncHandler(c, c.BindJSON(&hourRecordRequest), nil, common.ParameterError) {
 		return
 	}
 
@@ -40,7 +40,7 @@ func AddHourRecord(c *gin.Context) {
 
 	err := tx.Create(&hourRecord).Error
 	// 数据库错误
-	if common.FuncHandler(c, err, nil, 20002) {
+	if common.FuncHandler(c, err, nil, common.DatabaseError) {
 		// 发生错误时回滚事务
 		tx.Rollback()
 		return
@@ -54,7 +54,7 @@ func AddHourRecord(c *gin.Context) {
 
 	err = tx.Create(&record).Error
 	// 数据库错误
-	if common.FuncHandler(c, err, nil, 20002) {
+	if common.FuncHandler(c, err, nil, common.DatabaseError) {
 		// 发生错误时回滚事务
 		tx.Rollback()
 		return
@@ -76,7 +76,7 @@ func AddHourRecord(c *gin.Context) {
 // @Router /wx/record/add_item_record [post]
 func AddItemRecord(c *gin.Context) {
 	var itemRecordRequest model.ItemRecordRequest
-	if common.FuncHandler(c, c.BindJSON(&itemRecordRequest), nil, 20001) {
+	if common.FuncHandler(c, c.BindJSON(&itemRecordRequest), nil, common.ParameterError) {
 		return
 	}
 
@@ -89,7 +89,7 @@ func AddItemRecord(c *gin.Context) {
 
 	err := tx.Create(&itemRecord).Error
 	// 数据库错误
-	if common.FuncHandler(c, err, nil, 20002) {
+	if common.FuncHandler(c, err, nil, common.DatabaseError) {
 		// 发生错误时回滚事务
 		tx.Rollback()
 		return
@@ -103,7 +103,7 @@ func AddItemRecord(c *gin.Context) {
 
 	err = tx.Create(&record).Error
 	// 数据库错误
-	if common.FuncHandler(c, err, nil, 20002) {
+	if common.FuncHandler(c, err, nil, common.DatabaseError) {
 		// 发生错误时回滚事务
 		tx.Rollback()
 		return
@@ -131,11 +131,11 @@ func CheckRecorded(c *gin.Context) {
 	var err error
 
 	groupID, err = strconv.ParseInt(c.Query("group_id"), 10, 64)
-	if common.FuncHandler(c, err, nil, 20001) {
+	if common.FuncHandler(c, err, nil, common.ParameterError) {
 		return
 	}
 	workerID, err = strconv.ParseInt(c.Query("worker_id"), 10, 64)
-	if common.FuncHandler(c, err, nil, 20001) {
+	if common.FuncHandler(c, err, nil, common.ParameterError) {
 		return
 	}
 	date := c.Query("date")
@@ -153,7 +153,7 @@ func CheckRecorded(c *gin.Context) {
 
 			var hourRecord model.HourRecord
 			err = db.First(&hourRecord, record.RecordID).Error
-			if common.FuncHandler(c, err, nil, 20002) {
+			if common.FuncHandler(c, err, nil, common.DatabaseError) {
 				return
 			}
 
@@ -169,7 +169,7 @@ func CheckRecorded(c *gin.Context) {
 
 			var itemRecord model.ItemRecord
 			err = db.First(&itemRecord, record.RecordID).Error
-			if common.FuncHandler(c, err, nil, 20002) {
+			if common.FuncHandler(c, err, nil, common.DatabaseError) {
 				return
 			}
 

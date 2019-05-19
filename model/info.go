@@ -1,7 +1,7 @@
 package model
 
-// WorkerType 工种类型
-type WorkerType struct {
+// WorkType 工种类型
+type WorkType struct {
 	ID   int64  `json:"id"`
 	Name string `json:"name"`
 }
