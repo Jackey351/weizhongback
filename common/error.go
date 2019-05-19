@@ -173,6 +173,7 @@ var Errors = map[int]string{
 
 	// 系统级错误
 	SystemError:         "System error",
+	DatabaseError:       "Database error",
 	ServiceUnavailable:  "Service unavailable",
 	ParameterError:      "Parameter error",
 	ResourceUnavailable: "Resource unavailable",
