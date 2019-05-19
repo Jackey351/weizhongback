@@ -1,17 +1,17 @@
 package model
 
-// LocationInfoWrapper 位置信息wrapper
-type LocationInfoWrapper struct {
+// LocationInfoReq 位置信息请求字段
+type LocationInfoReq struct {
 	Title     string `json:"title" example:"人民广场"`
 	Addr      string `json:"addr" example:"湖北省襄阳市樊城区武商广场店对面人民公园"`
 	Latitude  string `json:"latitude" example:"32.04278"`
 	Longitude string `json:"longitude" example:"112.15519"`
 }
 
-// LocationInfo 位置信息wrapper
+// LocationInfo 位置信息数据库字段
 type LocationInfo struct {
 	ID int64
-	LocationInfoWrapper
+	LocationInfoReq
 }
 
 // BasicWork 基本信息，不管啥类型都有的字段且出现在请求信息中
@@ -25,54 +25,54 @@ type BasicWork struct {
 	UserID              int64  `json:"user_id" example:"1"`
 }
 
-// WorkWrapper 工作请求wrapper
-type WorkWrapper struct {
+// WorkReq 通用工作请求字段
+type WorkReq struct {
 	BasicWork
-	Treatment           []string            `json:"final_treatment"`
-	LocationInfoWrapper LocationInfoWrapper `json:"location_info"`
+	Treatment       []string        `json:"final_treatment"`
+	LocationInfoReq LocationInfoReq `json:"location_info"`
 }
 
 // Work 与数据表work字段对应
 type Work struct {
 	ID int64 `json:"work_id"`
 	BasicWork
-	PricingMode string `json:"pricing_mode"`
+	PricingMode int64  `json:"pricing_mode"`
 	PublishTime int64  `json:"publish_time"`
 	Treatment   string `json:"treatment"`
 	LocationID  int64
 	Fid         int64
 }
 
-// DianWorkReturn 点工作为返回值
-type DianWorkReturn struct {
+// DianWorkRet 点工返回字段
+type DianWorkRet struct {
 	ID int64 `json:"work_id"`
 	BasicWork
-	PricingMode         string              `json:"pricing_mode"`
-	PublishTime         int64               `json:"publish_time"`
-	Treatment           []string            `json:"final_treatment"`
-	LocationInfoWrapper LocationInfoWrapper `json:"location_info"`
+	PricingMode     int64           `json:"pricing_mode"`
+	PublishTime     int64           `json:"publish_time"`
+	Treatment       []string        `json:"final_treatment"`
+	LocationInfoReq LocationInfoReq `json:"location_info"`
 	DianWorkOther
 }
 
-// BaoWorkReturn 包工作为返回值
-type BaoWorkReturn struct {
+// BaoWorkRet 包工返回字段
+type BaoWorkRet struct {
 	ID int64 `json:"work_id"`
 	BasicWork
-	PricingMode         string              `json:"pricing_mode"`
-	PublishTime         int64               `json:"publish_time"`
-	Treatment           []string            `json:"final_treatment"`
-	LocationInfoWrapper LocationInfoWrapper `json:"location_info"`
+	PricingMode     int64           `json:"pricing_mode"`
+	PublishTime     int64           `json:"publish_time"`
+	Treatment       []string        `json:"final_treatment"`
+	LocationInfoReq LocationInfoReq `json:"location_info"`
 	BaoWorkOther
 }
 
-// TujiWorkReturn 突击队作为返回值
-type TujiWorkReturn struct {
+// TujiWorkRet 突击队返回字段
+type TujiWorkRet struct {
 	ID int64 `json:"work_id"`
 	BasicWork
-	PricingMode         string              `json:"pricing_mode"`
-	PublishTime         int64               `json:"publish_time"`
-	Treatment           []string            `json:"final_treatment"`
-	LocationInfoWrapper LocationInfoWrapper `json:"location_info"`
+	PricingMode     int64           `json:"pricing_mode"`
+	PublishTime     int64           `json:"publish_time"`
+	Treatment       []string        `json:"final_treatment"`
+	LocationInfoReq LocationInfoReq `json:"location_info"`
 	TujiWorkOther
 }
 
@@ -84,13 +84,13 @@ type DianWorkOther struct {
 	Settlement string `json:"settlement" example:"月薪"`
 }
 
-// DianWorkWrapper 点工
-type DianWorkWrapper struct {
-	WorkWrapper
+// DianWorkReq 点工请求字段
+type DianWorkReq struct {
+	WorkReq
 	DianWorkOther
 }
 
-// DianWork 点工有id
+// DianWork 点工数据库字段
 type DianWork struct {
 	ID int64 `json:"id"`
 	DianWorkOther
@@ -104,13 +104,13 @@ type BaoWorkOther struct {
 	UnitPrice  string `json:"unit_price" example:"2"`
 }
 
-// BaoWorkWrapper 包工
-type BaoWorkWrapper struct {
-	WorkWrapper
+// BaoWorkReq 包工请求字段
+type BaoWorkReq struct {
+	WorkReq
 	BaoWorkOther
 }
 
-// BaoWork 包工有id
+// BaoWork 包工数据库字段
 type BaoWork struct {
 	ID int64
 	BaoWorkOther
@@ -125,13 +125,13 @@ type TujiWorkOther struct {
 	Money     int64  `json:"money" example:"80"`
 }
 
-// TujiWorkWrapper 突击队
-type TujiWorkWrapper struct {
-	WorkWrapper
+// TujiWorkReq 突击队
+type TujiWorkReq struct {
+	WorkReq
 	TujiWorkOther
 }
 
-// TujiWork 突击队有id
+// TujiWork 突击队数据库字段
 type TujiWork struct {
 	ID int64
 	TujiWorkOther

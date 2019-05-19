@@ -72,7 +72,9 @@ func main() {
 	r.GET("/wx/info/worker_types", wx.GetWokerType)
 	r.GET("/wx/info/project_types", wx.GetProjectType)
 	// 工作相关
-	r.POST("/wx/work/publish", wx.PublishWork)
+	r.POST("/wx/work/publish_dian", wx.PublishDianWork)
+	r.POST("/wx/work/publish_bao", wx.PublishBaoWork)
+	r.POST("/wx/work/publish_tuji", wx.PublishTujiWork)
 	r.GET("/wx/work/search", wx.SearchWork)
 	// 班组相关
 	r.POST("/wx/group/new_group", wx.NewGroup)

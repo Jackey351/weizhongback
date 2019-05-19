@@ -12,238 +12,252 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// PublishWork 发布工作
-// @Summary 发布工作
-// @Description 发布工作
+// 工作计价类型
+const (
+	DianWork = 0
+	BaoWork  = 1
+	TujiWork = 2
+)
+
+// PublishDianWork 发布点工工作
+// @Summary 发布点工工作
+// @Description 发布点工工作
 // @Tags 工作相关
-// @Param work_type query int true "工种 0(点工),1(包工),2(突击队) 必填"
-// @Param 点工示例数据 body model.DianWorkWrapper true "点工招聘"
+// @Param dian_work body model.DianWorkReq true "点工招聘数据"
 // @Accept json
 // @Produce json
 // @Success 200 {object} controller.Message
-// @Router /wx/work/publish [post]
-func PublishWork(c *gin.Context) {
-	priceType := c.Query("work_type")
-
-	if common.FuncHandler(c, priceType == "0" || priceType == "1" || priceType == "2", true, common.ParameterError) {
+// @Router /wx/work/publish_dian [post]
+func PublishDianWork(c *gin.Context) {
+	var dianWorkReq model.DianWorkReq
+	if common.FuncHandler(c, c.BindJSON(&dianWorkReq), nil, common.ParameterError) {
 		return
 	}
 
-	switch priceType {
-	case "0":
-		var workWrapper model.DianWorkWrapper
-		if common.FuncHandler(c, c.BindJSON(&workWrapper), nil, common.ParameterError) {
-			return
-		}
+	db := common.GetMySQL()
 
-		db := common.GetMySQL()
+	// 检查工种和工程类别是否正确
+	projectType := dianWorkReq.BasicWork.ProjectType
+	workerType := dianWorkReq.BasicWork.WorkerType
 
-		// 检查工种和工程类别是否正确
-		projectType := workWrapper.BasicWork.ProjectType
-		workerType := workWrapper.BasicWork.WorkerType
-
-		var res model.ProjectType
-		err := db.Where("name = ?", projectType).First(&res).Error
-		// 找不到数据
-		if common.FuncHandler(c, err, nil, common.ProjectTypeNoExist) {
-			return
-		}
-
-		var res2 model.WorkType
-		err = db.Where("name = ?", workerType).First(&res2).Error
-		// 找不到数据
-		if common.FuncHandler(c, err, nil, common.WorkTypeNoExist) {
-			return
-		}
-
-		var dianWork model.DianWork
-		dianWork.DianWorkOther = workWrapper.DianWorkOther
-
-		tx := db.Begin()
-
-		err = tx.Create(&dianWork).Error
-		// 数据库错误
-		if common.FuncHandler(c, err, nil, common.DatabaseError) {
-			// 发生错误时回滚事务
-			tx.Rollback()
-			return
-		}
-
-		var locationInfo model.LocationInfo
-		locationInfo.LocationInfoWrapper = workWrapper.WorkWrapper.LocationInfoWrapper
-		err = tx.Create(&locationInfo).Error
-		// 数据库错误
-		if common.FuncHandler(c, err, nil, common.DatabaseError) {
-			// 发生错误时回滚事务
-			tx.Rollback()
-			return
-		}
-
-		var work model.Work
-		work.BasicWork = workWrapper.WorkWrapper.BasicWork
-		work.LocationID = locationInfo.ID
-		work.Treatment = strings.Join(workWrapper.WorkWrapper.Treatment, ",")
-		work.Fid = dianWork.ID
-		work.PricingMode = "点工"
-		work.PublishTime = time.Now().Unix()
-
-		err = tx.Create(&work).Error
-		// 数据库错误
-		if common.FuncHandler(c, err, nil, common.DatabaseError) {
-			// 发生错误时回滚事务
-			tx.Rollback()
-			return
-		}
-
-		tx.Commit()
-		c.JSON(http.StatusOK, controller.Message{
-			Msg: "发布成功",
-		})
-
-		break
-
-	case "1":
-		var workWrapper model.BaoWorkWrapper
-		if common.FuncHandler(c, c.BindJSON(&workWrapper), nil, common.ParameterError) {
-			return
-		}
-
-		db := common.GetMySQL()
-
-		// 检查工种和工程类别是否正确
-		projectType := workWrapper.BasicWork.ProjectType
-		workerType := workWrapper.BasicWork.WorkerType
-
-		var res model.ProjectType
-		err := db.Where("name = ?", projectType).First(&res).Error
-		// 找不到数据
-		if common.FuncHandler(c, err, nil, common.ProjectTypeNoExist) {
-			return
-		}
-
-		var res2 model.WorkType
-		err = db.Where("name = ?", workerType).First(&res2).Error
-		// 找不到数据
-		if common.FuncHandler(c, err, nil, common.WorkTypeNoExist) {
-			return
-		}
-
-		var baoWork model.BaoWork
-		baoWork.BaoWorkOther = workWrapper.BaoWorkOther
-
-		tx := db.Begin()
-
-		err = tx.Create(&baoWork).Error
-		// 数据库错误
-		if common.FuncHandler(c, err, nil, common.DatabaseError) {
-			// 发生错误时回滚事务
-			tx.Rollback()
-			return
-		}
-
-		var locationInfo model.LocationInfo
-		locationInfo.LocationInfoWrapper = workWrapper.WorkWrapper.LocationInfoWrapper
-		err = tx.Create(&locationInfo).Error
-		// 数据库错误
-		if common.FuncHandler(c, err, nil, common.DatabaseError) {
-			// 发生错误时回滚事务
-			tx.Rollback()
-			return
-		}
-
-		var work model.Work
-		work.BasicWork = workWrapper.WorkWrapper.BasicWork
-		work.LocationID = locationInfo.ID
-		work.Treatment = strings.Join(workWrapper.WorkWrapper.Treatment, ",")
-		work.Fid = baoWork.ID
-		work.PricingMode = "包工"
-		work.PublishTime = time.Now().Unix()
-
-		err = tx.Create(&work).Error
-		// 数据库错误
-		if common.FuncHandler(c, err, nil, common.DatabaseError) {
-			// 发生错误时回滚事务
-			tx.Rollback()
-			return
-		}
-
-		tx.Commit()
-		c.JSON(http.StatusOK, controller.Message{
-			Msg: "发布成功",
-		})
-		break
-	case "2":
-		var workWrapper model.TujiWorkWrapper
-		if common.FuncHandler(c, c.BindJSON(&workWrapper), nil, common.ParameterError) {
-			return
-		}
-
-		db := common.GetMySQL()
-
-		// 检查工种和工程类别是否正确
-		projectType := workWrapper.BasicWork.ProjectType
-		workerType := workWrapper.BasicWork.WorkerType
-
-		var res model.ProjectType
-		err := db.Where("name = ?", projectType).First(&res).Error
-		// 找不到数据
-		if common.FuncHandler(c, err, nil, common.ProjectTypeNoExist) {
-			return
-		}
-
-		var res2 model.WorkType
-		err = db.Where("name = ?", workerType).First(&res2).Error
-		// 找不到数据
-		if common.FuncHandler(c, err, nil, common.WorkTypeNoExist) {
-			return
-		}
-
-		var tujiWork model.TujiWork
-		tujiWork.TujiWorkOther = workWrapper.TujiWorkOther
-
-		tx := db.Begin()
-
-		err = tx.Create(&tujiWork).Error
-		// 数据库错误
-		if common.FuncHandler(c, err, nil, common.DatabaseError) {
-			// 发生错误时回滚事务
-			tx.Rollback()
-			return
-		}
-
-		var locationInfo model.LocationInfo
-		locationInfo.LocationInfoWrapper = workWrapper.WorkWrapper.LocationInfoWrapper
-		err = tx.Create(&locationInfo).Error
-		// 数据库错误
-		if common.FuncHandler(c, err, nil, common.DatabaseError) {
-			// 发生错误时回滚事务
-			tx.Rollback()
-			return
-		}
-
-		var work model.Work
-		work.BasicWork = workWrapper.WorkWrapper.BasicWork
-		work.LocationID = locationInfo.ID
-		work.Treatment = strings.Join(workWrapper.WorkWrapper.Treatment, ",")
-		work.Fid = tujiWork.ID
-		work.PricingMode = "突击队"
-		work.PublishTime = time.Now().Unix()
-
-		err = tx.Create(&work).Error
-		// 数据库错误
-		if common.FuncHandler(c, err, nil, common.DatabaseError) {
-			// 发生错误时回滚事务
-			tx.Rollback()
-			return
-		}
-
-		tx.Commit()
-		c.JSON(http.StatusOK, controller.Message{
-			Msg: "发布成功",
-		})
-		break
+	var res model.ProjectType
+	err := db.Where("name = ?", projectType).First(&res).Error
+	// 找不到数据
+	if common.FuncHandler(c, err, nil, common.ProjectTypeNoExist) {
+		return
 	}
 
+	var res2 model.WorkType
+	err = db.Where("name = ?", workerType).First(&res2).Error
+	// 找不到数据
+	if common.FuncHandler(c, err, nil, common.WorkTypeNoExist) {
+		return
+	}
+
+	var dianWork model.DianWork
+	dianWork.DianWorkOther = dianWorkReq.DianWorkOther
+
+	tx := db.Begin()
+
+	err = tx.Create(&dianWork).Error
+	// 数据库错误
+	if common.FuncHandler(c, err, nil, common.DatabaseError) {
+		// 发生错误时回滚事务
+		tx.Rollback()
+		return
+	}
+
+	var locationInfo model.LocationInfo
+	locationInfo.LocationInfoReq = dianWorkReq.WorkReq.LocationInfoReq
+	err = tx.Create(&locationInfo).Error
+	// 数据库错误
+	if common.FuncHandler(c, err, nil, common.DatabaseError) {
+		// 发生错误时回滚事务
+		tx.Rollback()
+		return
+	}
+
+	var work model.Work
+	work.BasicWork = dianWorkReq.WorkReq.BasicWork
+	work.LocationID = locationInfo.ID
+	work.Treatment = strings.Join(dianWorkReq.WorkReq.Treatment, ",")
+	work.Fid = dianWork.ID
+	work.PricingMode = DianWork
+	work.PublishTime = time.Now().Unix()
+
+	err = tx.Create(&work).Error
+	// 数据库错误
+	if common.FuncHandler(c, err, nil, common.DatabaseError) {
+		// 发生错误时回滚事务
+		tx.Rollback()
+		return
+	}
+
+	tx.Commit()
+	c.JSON(http.StatusOK, controller.Message{
+		Msg: "发布成功",
+	})
+}
+
+// PublishBaoWork 发布包工工作
+// @Summary 发布包工工作
+// @Description 发布包工工作
+// @Tags 工作相关
+// @Param bao_work body model.BaoWorkReq true "包工招聘数据"
+// @Accept json
+// @Produce json
+// @Success 200 {object} controller.Message
+// @Router /wx/work/publish_bao [post]
+func PublishBaoWork(c *gin.Context) {
+	var baoWorkReq model.BaoWorkReq
+	if common.FuncHandler(c, c.BindJSON(&baoWorkReq), nil, common.ParameterError) {
+		return
+	}
+
+	db := common.GetMySQL()
+
+	// 检查工种和工程类别是否正确
+	projectType := baoWorkReq.BasicWork.ProjectType
+	workerType := baoWorkReq.BasicWork.WorkerType
+
+	var res model.ProjectType
+	err := db.Where("name = ?", projectType).First(&res).Error
+	// 找不到数据
+	if common.FuncHandler(c, err, nil, common.ProjectTypeNoExist) {
+		return
+	}
+
+	var res2 model.WorkType
+	err = db.Where("name = ?", workerType).First(&res2).Error
+	// 找不到数据
+	if common.FuncHandler(c, err, nil, common.WorkTypeNoExist) {
+		return
+	}
+
+	var baoWork model.BaoWork
+	baoWork.BaoWorkOther = baoWorkReq.BaoWorkOther
+
+	tx := db.Begin()
+
+	err = tx.Create(&baoWork).Error
+	// 数据库错误
+	if common.FuncHandler(c, err, nil, common.DatabaseError) {
+		// 发生错误时回滚事务
+		tx.Rollback()
+		return
+	}
+
+	var locationInfo model.LocationInfo
+	locationInfo.LocationInfoReq = baoWorkReq.WorkReq.LocationInfoReq
+	err = tx.Create(&locationInfo).Error
+	// 数据库错误
+	if common.FuncHandler(c, err, nil, common.DatabaseError) {
+		// 发生错误时回滚事务
+		tx.Rollback()
+		return
+	}
+
+	var work model.Work
+	work.BasicWork = baoWorkReq.WorkReq.BasicWork
+	work.LocationID = locationInfo.ID
+	work.Treatment = strings.Join(baoWorkReq.WorkReq.Treatment, ",")
+	work.Fid = baoWork.ID
+	work.PricingMode = BaoWork
+	work.PublishTime = time.Now().Unix()
+
+	err = tx.Create(&work).Error
+	// 数据库错误
+	if common.FuncHandler(c, err, nil, common.DatabaseError) {
+		// 发生错误时回滚事务
+		tx.Rollback()
+		return
+	}
+
+	tx.Commit()
+	c.JSON(http.StatusOK, controller.Message{
+		Msg: "发布成功",
+	})
+
+}
+
+// PublishTujiWork 发布突击队工作
+// @Summary 发布突击队工作
+// @Description 发布突击队工作
+// @Tags 工作相关
+// @Param tuji_work body model.TujiWorkReq true "突击队招聘数据"
+// @Accept json
+// @Produce json
+// @Success 200 {object} controller.Message
+// @Router /wx/work/publish_tuji [post]
+func PublishTujiWork(c *gin.Context) {
+	var tujiWorkReq model.TujiWorkReq
+	if common.FuncHandler(c, c.BindJSON(&tujiWorkReq), nil, common.ParameterError) {
+		return
+	}
+
+	db := common.GetMySQL()
+
+	// 检查工种和工程类别是否正确
+	projectType := tujiWorkReq.BasicWork.ProjectType
+	workerType := tujiWorkReq.BasicWork.WorkerType
+
+	var res model.ProjectType
+	err := db.Where("name = ?", projectType).First(&res).Error
+	// 找不到数据
+	if common.FuncHandler(c, err, nil, common.ProjectTypeNoExist) {
+		return
+	}
+
+	var res2 model.WorkType
+	err = db.Where("name = ?", workerType).First(&res2).Error
+	// 找不到数据
+	if common.FuncHandler(c, err, nil, common.WorkTypeNoExist) {
+		return
+	}
+
+	var tujiWork model.TujiWork
+	tujiWork.TujiWorkOther = tujiWorkReq.TujiWorkOther
+
+	tx := db.Begin()
+
+	err = tx.Create(&tujiWork).Error
+	// 数据库错误
+	if common.FuncHandler(c, err, nil, common.DatabaseError) {
+		// 发生错误时回滚事务
+		tx.Rollback()
+		return
+	}
+
+	var locationInfo model.LocationInfo
+	locationInfo.LocationInfoReq = tujiWorkReq.WorkReq.LocationInfoReq
+	err = tx.Create(&locationInfo).Error
+	// 数据库错误
+	if common.FuncHandler(c, err, nil, common.DatabaseError) {
+		// 发生错误时回滚事务
+		tx.Rollback()
+		return
+	}
+
+	var work model.Work
+	work.BasicWork = tujiWorkReq.WorkReq.BasicWork
+	work.LocationID = locationInfo.ID
+	work.Treatment = strings.Join(tujiWorkReq.WorkReq.Treatment, ",")
+	work.Fid = tujiWork.ID
+	work.PricingMode = TujiWork
+	work.PublishTime = time.Now().Unix()
+
+	err = tx.Create(&work).Error
+	// 数据库错误
+	if common.FuncHandler(c, err, nil, common.DatabaseError) {
+		// 发生错误时回滚事务
+		tx.Rollback()
+		return
+	}
+
+	tx.Commit()
+	c.JSON(http.StatusOK, controller.Message{
+		Msg: "发布成功",
+	})
 }
 
 // SearchWork 搜索工作
@@ -263,7 +277,18 @@ func SearchWork(c *gin.Context) {
 	projectType := c.Query("type")
 	need := c.Query("need")
 	location := c.Query("location")
-	workType := c.Query("work_type")
+
+	workTypeQuery := c.Query("work_type")
+	var workType int
+	if workTypeQuery != "" {
+		var err error
+		workType, err = strconv.Atoi(workTypeQuery)
+		if common.FuncHandler(c, err, nil, common.ParameterError) {
+			return
+		}
+	} else {
+		workType = 0
+	}
 
 	page, err := strconv.Atoi(c.Query("page"))
 	if common.FuncHandler(c, err, nil, common.ParameterError) {
@@ -306,10 +331,10 @@ func SearchWork(c *gin.Context) {
 		dbsearch = dbsearch.Where("location = ?", location)
 	}
 
-	if workType == "1" {
-		dbsearch = dbsearch.Where("pricing_mode = ?", "突击队")
+	if workType == 1 {
+		dbsearch = dbsearch.Where("pricing_mode = ?", TujiWork)
 	} else {
-		dbsearch = dbsearch.Where("pricing_mode = ? OR pricing_mode = ?", "点工", "包工")
+		dbsearch = dbsearch.Where("pricing_mode = ? OR pricing_mode = ?", DianWork, BaoWork)
 	}
 
 	var works []model.Work
@@ -334,8 +359,8 @@ func SearchWork(c *gin.Context) {
 
 		for _, work := range works {
 			switch work.PricingMode {
-			case "点工":
-				var dianWorkRet model.DianWorkReturn
+			case DianWork:
+				var dianWorkRet model.DianWorkRet
 				dianWorkRet.ID = work.ID
 				dianWorkRet.BasicWork = work.BasicWork
 				dianWorkRet.Treatment = strings.Split(work.Treatment, ",")
@@ -351,7 +376,7 @@ func SearchWork(c *gin.Context) {
 				if common.FuncHandler(c, err, nil, common.DatabaseError) {
 					return
 				}
-				dianWorkRet.LocationInfoWrapper = locationInfo.LocationInfoWrapper
+				dianWorkRet.LocationInfoReq = locationInfo.LocationInfoReq
 
 				var dianWork model.DianWork
 				err = db.First(&dianWork, dianID).Error
@@ -365,8 +390,8 @@ func SearchWork(c *gin.Context) {
 
 				break
 
-			case "包工":
-				var baoWorkRet model.BaoWorkReturn
+			case BaoWork:
+				var baoWorkRet model.BaoWorkRet
 				baoWorkRet.ID = work.ID
 				baoWorkRet.BasicWork = work.BasicWork
 				baoWorkRet.Treatment = strings.Split(work.Treatment, ",")
@@ -382,7 +407,7 @@ func SearchWork(c *gin.Context) {
 				if common.FuncHandler(c, err, nil, common.DatabaseError) {
 					return
 				}
-				baoWorkRet.LocationInfoWrapper = locationInfo.LocationInfoWrapper
+				baoWorkRet.LocationInfoReq = locationInfo.LocationInfoReq
 
 				var baoWork model.BaoWork
 				err = db.First(&baoWork, baoID).Error
@@ -394,8 +419,8 @@ func SearchWork(c *gin.Context) {
 
 				mWork = append(mWork, baoWorkRet)
 				break
-			case "突击队":
-				var tujiWorkRet model.TujiWorkReturn
+			case TujiWork:
+				var tujiWorkRet model.TujiWorkRet
 				tujiWorkRet.ID = work.ID
 				tujiWorkRet.BasicWork = work.BasicWork
 				tujiWorkRet.Treatment = strings.Split(work.Treatment, ",")
@@ -411,7 +436,7 @@ func SearchWork(c *gin.Context) {
 				if common.FuncHandler(c, err, nil, common.DatabaseError) {
 					return
 				}
-				tujiWorkRet.LocationInfoWrapper = locationInfo.LocationInfoWrapper
+				tujiWorkRet.LocationInfoReq = locationInfo.LocationInfoReq
 
 				var tujiWork model.TujiWork
 				err = db.First(&tujiWork, tujiID).Error

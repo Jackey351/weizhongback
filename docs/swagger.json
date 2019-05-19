@@ -404,9 +404,9 @@
                 }
             }
         },
-        "/wx/work/publish": {
+        "/wx/work/publish_bao": {
             "post": {
-                "description": "发布工作",
+                "description": "发布包工工作",
                 "consumes": [
                     "application/json"
                 ],
@@ -416,23 +416,88 @@
                 "tags": [
                     "工作相关"
                 ],
-                "summary": "发布工作",
+                "summary": "发布包工工作",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "工种 0(点工),1(包工),2(突击队) 必填",
-                        "name": "work_type",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "description": "点工招聘",
-                        "name": "点工示例数据",
+                        "description": "包工招聘数据",
+                        "name": "bao_work",
                         "in": "body",
                         "required": true,
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/model.DianWorkWrapper"
+                            "$ref": "#/definitions/model.BaoWorkReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/controller.Message"
+                        }
+                    }
+                }
+            }
+        },
+        "/wx/work/publish_dian": {
+            "post": {
+                "description": "发布点工工作",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "工作相关"
+                ],
+                "summary": "发布点工工作",
+                "parameters": [
+                    {
+                        "description": "点工招聘数据",
+                        "name": "dian_work",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/model.DianWorkReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/controller.Message"
+                        }
+                    }
+                }
+            }
+        },
+        "/wx/work/publish_tuji": {
+            "post": {
+                "description": "发布突击队工作",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "工作相关"
+                ],
+                "summary": "发布突击队工作",
+                "parameters": [
+                    {
+                        "description": "突击队招聘数据",
+                        "name": "tuji_work",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/model.TujiWorkReq"
                         }
                     }
                 ],
@@ -524,7 +589,7 @@
                 }
             }
         },
-        "model.DianWorkWrapper": {
+        "model.BaoWorkReq": {
             "type": "object",
             "properties": {
                 "construction_company": {
@@ -547,7 +612,66 @@
                 },
                 "location_info": {
                     "type": "object",
-                    "$ref": "#/definitions/model.LocationInfoWrapper"
+                    "$ref": "#/definitions/model.LocationInfoReq"
+                },
+                "need": {
+                    "type": "string",
+                    "example": "钢筋工"
+                },
+                "project_name": {
+                    "type": "string",
+                    "example": "主楼建造"
+                },
+                "scale": {
+                    "type": "string",
+                    "example": "大"
+                },
+                "totle_price": {
+                    "type": "string",
+                    "example": "300"
+                },
+                "type": {
+                    "type": "string",
+                    "example": "消防"
+                },
+                "unit": {
+                    "type": "string",
+                    "example": "元/平方米"
+                },
+                "unit_price": {
+                    "type": "string",
+                    "example": "2"
+                },
+                "user_id": {
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
+        "model.DianWorkReq": {
+            "type": "object",
+            "properties": {
+                "construction_company": {
+                    "type": "string",
+                    "example": "飞燕工程队"
+                },
+                "desc": {
+                    "type": "string",
+                    "example": "包吃包住"
+                },
+                "final_treatment": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "location": {
+                    "type": "string",
+                    "example": "湖北省襄阳市"
+                },
+                "location_info": {
+                    "type": "object",
+                    "$ref": "#/definitions/model.LocationInfoReq"
                 },
                 "max_wage": {
                     "type": "string",
@@ -652,7 +776,7 @@
                 }
             }
         },
-        "model.LocationInfoWrapper": {
+        "model.LocationInfoReq": {
             "type": "object",
             "properties": {
                 "addr": {
@@ -670,6 +794,69 @@
                 "title": {
                     "type": "string",
                     "example": "人民广场"
+                }
+            }
+        },
+        "model.TujiWorkReq": {
+            "type": "object",
+            "properties": {
+                "construction_company": {
+                    "type": "string",
+                    "example": "飞燕工程队"
+                },
+                "desc": {
+                    "type": "string",
+                    "example": "包吃包住"
+                },
+                "final_treatment": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "location": {
+                    "type": "string",
+                    "example": "湖北省襄阳市"
+                },
+                "location_info": {
+                    "type": "object",
+                    "$ref": "#/definitions/model.LocationInfoReq"
+                },
+                "money": {
+                    "type": "integer",
+                    "example": 80
+                },
+                "need": {
+                    "type": "string",
+                    "example": "钢筋工"
+                },
+                "project_name": {
+                    "type": "string",
+                    "example": "主楼建造"
+                },
+                "required_people": {
+                    "type": "integer",
+                    "example": 12
+                },
+                "type": {
+                    "type": "string",
+                    "example": "消防"
+                },
+                "user_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "work_date": {
+                    "type": "string",
+                    "example": "2019-05-12"
+                },
+                "work_days": {
+                    "type": "integer",
+                    "example": 10
+                },
+                "work_time": {
+                    "type": "string",
+                    "example": "8"
                 }
             }
         },
