@@ -20,7 +20,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "miscellaneous"
+                    "测试"
                 ],
                 "summary": "PING-PONG",
                 "responses": {
@@ -44,19 +44,19 @@
                     "application/json"
                 ],
                 "tags": [
-                    "wx"
+                    "班组相关"
                 ],
                 "summary": "删除班组中某个成员",
                 "parameters": [
                     {
-                        "type": "string",
+                        "type": "integer",
                         "description": "班组id",
                         "name": "group_id",
                         "in": "query",
                         "required": true
                     },
                     {
-                        "type": "string",
+                        "type": "integer",
                         "description": "删除用户id",
                         "name": "user_id",
                         "in": "query",
@@ -76,7 +76,7 @@
         },
         "/wx/group/group_member": {
             "get": {
-                "description": "班组所有成员",
+                "description": "获取班组所有成员",
                 "consumes": [
                     "application/json"
                 ],
@@ -84,12 +84,12 @@
                     "application/json"
                 ],
                 "tags": [
-                    "wx"
+                    "班组相关"
                 ],
-                "summary": "班组所有成员",
+                "summary": "获取班组所有成员",
                 "parameters": [
                     {
-                        "type": "string",
+                        "type": "integer",
                         "description": "班组id",
                         "name": "group_id",
                         "in": "query",
@@ -117,12 +117,12 @@
                     "application/json"
                 ],
                 "tags": [
-                    "wx"
+                    "班组相关"
                 ],
                 "summary": "查询自己参与的班组",
                 "parameters": [
                     {
-                        "type": "string",
+                        "type": "integer",
                         "description": "用户id",
                         "name": "user_id",
                         "in": "query",
@@ -142,7 +142,7 @@
         },
         "/wx/group/join_group": {
             "get": {
-                "description": "加入群组",
+                "description": "加入班组",
                 "consumes": [
                     "application/json"
                 ],
@@ -150,12 +150,12 @@
                     "application/json"
                 ],
                 "tags": [
-                    "wx"
+                    "班组相关"
                 ],
-                "summary": "加入群组",
+                "summary": "加入班组",
                 "parameters": [
                     {
-                        "type": "string",
+                        "type": "integer",
                         "description": "用户id",
                         "name": "user_id",
                         "in": "query",
@@ -182,7 +182,7 @@
         },
         "/wx/group/new_group": {
             "post": {
-                "description": "创建新群组",
+                "description": "创建新班组",
                 "consumes": [
                     "application/json"
                 ],
@@ -190,12 +190,12 @@
                     "application/json"
                 ],
                 "tags": [
-                    "wx"
+                    "班组相关"
                 ],
-                "summary": "创建新群组",
+                "summary": "创建新班组",
                 "parameters": [
                     {
-                        "description": "create a new group",
+                        "description": "创建新班组",
                         "name": "user",
                         "in": "body",
                         "required": true,
@@ -223,7 +223,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "wx"
+                    "各种类型信息"
                 ],
                 "summary": "获取所有工程类别",
                 "responses": {
@@ -244,7 +244,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "wx"
+                    "各种类型信息"
                 ],
                 "summary": "获取所有工种",
                 "responses": {
@@ -265,7 +265,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "工作记录"
+                    "工作记录相关"
                 ],
                 "summary": "添加工时记录",
                 "parameters": [
@@ -298,7 +298,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "工作记录"
+                    "工作记录相关"
                 ],
                 "summary": "添加分项记录",
                 "parameters": [
@@ -331,7 +331,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "工作记录"
+                    "工作记录相关"
                 ],
                 "summary": "检查某日是否记录",
                 "parameters": [
@@ -378,8 +378,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "wx",
-                    "user"
+                    "用户相关"
                 ],
                 "summary": "小程序端新添用户",
                 "parameters": [
@@ -415,12 +414,12 @@
                     "application/json"
                 ],
                 "tags": [
-                    "wx"
+                    "工作相关"
                 ],
                 "summary": "发布工作",
                 "parameters": [
                     {
-                        "type": "string",
+                        "type": "integer",
                         "description": "工种 0(点工),1(包工),2(突击队) 必填",
                         "name": "work_type",
                         "in": "query",
@@ -430,6 +429,7 @@
                         "description": "点工招聘",
                         "name": "点工示例数据",
                         "in": "body",
+                        "required": true,
                         "schema": {
                             "type": "object",
                             "$ref": "#/definitions/model.DianWorkWrapper"
@@ -454,7 +454,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "wx"
+                    "工作相关"
                 ],
                 "summary": "搜索工作",
                 "parameters": [
@@ -477,20 +477,20 @@
                         "in": "query"
                     },
                     {
-                        "type": "string",
+                        "type": "integer",
                         "description": "工作类别 选填0只返回点工和包工，1只返回突击队，默认为0",
                         "name": "work_type",
                         "in": "query"
                     },
                     {
-                        "type": "string",
+                        "type": "integer",
                         "description": "页码，从1开始 必填",
                         "name": "page",
                         "in": "query",
                         "required": true
                     },
                     {
-                        "type": "string",
+                        "type": "integer",
                         "description": "每页记录数 必填",
                         "name": "limit",
                         "in": "query",

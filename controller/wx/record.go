@@ -20,7 +20,7 @@ const (
 // AddHourRecord 添加工时记录
 // @Summary 添加工时记录
 // @Description 添加工时记录
-// @Tags 工作记录
+// @Tags 工作记录相关
 // @Param 工时记录数据 body model.HourRecordRequest true "工时记录数据"
 // @Produce json
 // @Success 200 {object} controller.Message
@@ -69,7 +69,7 @@ func AddHourRecord(c *gin.Context) {
 // AddItemRecord 添加分项记录
 // @Summary 添加分项记录
 // @Description 添加分项记录
-// @Tags 工作记录
+// @Tags 工作记录相关
 // @Param 分项记录数据 body model.ItemRecordRequest true "分项记录数据"
 // @Produce json
 // @Success 200 {object} controller.Message
@@ -118,7 +118,7 @@ func AddItemRecord(c *gin.Context) {
 // CheckRecorded 检查某日是否记录
 // @Summary 检查某日是否记录
 // @Description 检查某日是否记录
-// @Tags 工作记录
+// @Tags 工作记录相关
 // @Param group_id query int true "班组id"
 // @Param worker_id query int true "工人id"
 // @Param date query string true "日期"

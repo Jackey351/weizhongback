@@ -15,9 +15,9 @@ import (
 // PublishWork 发布工作
 // @Summary 发布工作
 // @Description 发布工作
-// @Tags wx
-// @Param work_type query string true "工种 0(点工),1(包工),2(突击队) 必填"
-// @Param 点工示例数据 body model.DianWorkWrapper false "点工招聘"
+// @Tags 工作相关
+// @Param work_type query int true "工种 0(点工),1(包工),2(突击队) 必填"
+// @Param 点工示例数据 body model.DianWorkWrapper true "点工招聘"
 // @Accept json
 // @Produce json
 // @Success 200 {object} controller.Message
@@ -249,13 +249,13 @@ func PublishWork(c *gin.Context) {
 // SearchWork 搜索工作
 // @Summary 搜索工作
 // @Description 搜索工作，需要某个筛选参数就加上，否则可以不加；按发布时间降序排序
-// @Tags wx
+// @Tags 工作相关
 // @Param location query string false "二级位置信息 选填"
 // @Param need query string false "所需工种 选填"
 // @Param type query string false "工程类别 选填"
-// @Param work_type query string false "工作类别 选填0只返回点工和包工，1只返回突击队，默认为0"
-// @Param page query string true "页码，从1开始 必填"
-// @Param limit query string true "每页记录数 必填"
+// @Param work_type query int false "工作类别 选填0只返回点工和包工，1只返回突击队，默认为0"
+// @Param page query int true "页码，从1开始 必填"
+// @Param limit query int true "每页记录数 必填"
 // @Produce json
 // @Success 200 {object} controller.Message
 // @Router /wx/work/search [get]

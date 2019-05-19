@@ -12,7 +12,7 @@ import (
 // NewWxUser 小程序新用户
 // @Summary 小程序端新添用户
 // @Description 小程序端新添用户
-// @Tags wx,user
+// @Tags 用户相关
 // @Param user body model.WxUserWrapper true "create a new user"
 // @Accept json
 // @Produce json

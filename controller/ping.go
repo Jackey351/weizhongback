@@ -9,7 +9,7 @@ import (
 // Ping godoc
 // @Summary PING-PONG
 // @Description 测试服务器是否在线
-// @Tags miscellaneous
+// @Tags 测试
 // @Accept json
 // @Produce json
 // @Success 200 {object} controller.Message

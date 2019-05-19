@@ -160,7 +160,7 @@ paths:
             type: object
       summary: PING-PONG
       tags:
-      - miscellaneous
+      - 测试
   /wx/group/delete_member:
     get:
       consumes:
@@ -171,12 +171,12 @@ paths:
         in: query
         name: group_id
         required: true
-        type: string
+        type: integer
       - description: 删除用户id
         in: query
         name: user_id
         required: true
-        type: string
+        type: integer
       produces:
       - application/json
       responses:
@@ -187,18 +187,18 @@ paths:
             type: object
       summary: 删除班组中某个成员
       tags:
-      - wx
+      - 班组相关
   /wx/group/group_member:
     get:
       consumes:
       - application/json
-      description: 班组所有成员
+      description: 获取班组所有成员
       parameters:
       - description: 班组id
         in: query
         name: group_id
         required: true
-        type: string
+        type: integer
       produces:
       - application/json
       responses:
@@ -207,9 +207,9 @@ paths:
           schema:
             $ref: '#/definitions/controller.Message'
             type: object
-      summary: 班组所有成员
+      summary: 获取班组所有成员
       tags:
-      - wx
+      - 班组相关
   /wx/group/in_group:
     get:
       consumes:
@@ -220,7 +220,7 @@ paths:
         in: query
         name: user_id
         required: true
-        type: string
+        type: integer
       produces:
       - application/json
       responses:
@@ -231,18 +231,18 @@ paths:
             type: object
       summary: 查询自己参与的班组
       tags:
-      - wx
+      - 班组相关
   /wx/group/join_group:
     get:
       consumes:
       - application/json
-      description: 加入群组
+      description: 加入班组
       parameters:
       - description: 用户id
         in: query
         name: user_id
         required: true
-        type: string
+        type: integer
       - description: 群组入群口令
         in: query
         name: group_key
@@ -256,16 +256,16 @@ paths:
           schema:
             $ref: '#/definitions/controller.Message'
             type: object
-      summary: 加入群组
+      summary: 加入班组
       tags:
-      - wx
+      - 班组相关
   /wx/group/new_group:
     post:
       consumes:
       - application/json
-      description: 创建新群组
+      description: 创建新班组
       parameters:
-      - description: create a new group
+      - description: 创建新班组
         in: body
         name: user
         required: true
@@ -280,9 +280,9 @@ paths:
           schema:
             $ref: '#/definitions/controller.Message'
             type: object
-      summary: 创建新群组
+      summary: 创建新班组
       tags:
-      - wx
+      - 班组相关
   /wx/info/project_types:
     get:
       description: 获取所有工程类别
@@ -296,7 +296,7 @@ paths:
             type: object
       summary: 获取所有工程类别
       tags:
-      - wx
+      - 各种类型信息
   /wx/info/worker_types:
     get:
       description: 获取所有工种
@@ -310,7 +310,7 @@ paths:
             type: object
       summary: 获取所有工种
       tags:
-      - wx
+      - 各种类型信息
   /wx/record/add_hour_record:
     post:
       description: 添加工时记录
@@ -332,7 +332,7 @@ paths:
             type: object
       summary: 添加工时记录
       tags:
-      - 工作记录
+      - 工作记录相关
   /wx/record/add_item_record:
     post:
       description: 添加分项记录
@@ -354,7 +354,7 @@ paths:
             type: object
       summary: 添加分项记录
       tags:
-      - 工作记录
+      - 工作记录相关
   /wx/record/check_recorded:
     get:
       description: 检查某日是否记录
@@ -384,7 +384,7 @@ paths:
             type: object
       summary: 检查某日是否记录
       tags:
-      - 工作记录
+      - 工作记录相关
   /wx/user/new_user:
     post:
       consumes:
@@ -408,8 +408,7 @@ paths:
             type: object
       summary: 小程序端新添用户
       tags:
-      - wx
-      - user
+      - 用户相关
   /wx/work/publish:
     post:
       consumes:
@@ -420,10 +419,11 @@ paths:
         in: query
         name: work_type
         required: true
-        type: string
+        type: integer
       - description: 点工招聘
         in: body
         name: 点工示例数据
+        required: true
         schema:
           $ref: '#/definitions/model.DianWorkWrapper'
           type: object
@@ -437,7 +437,7 @@ paths:
             type: object
       summary: 发布工作
       tags:
-      - wx
+      - 工作相关
   /wx/work/search:
     get:
       description: 搜索工作，需要某个筛选参数就加上，否则可以不加；按发布时间降序排序
@@ -457,17 +457,17 @@ paths:
       - description: 工作类别 选填0只返回点工和包工，1只返回突击队，默认为0
         in: query
         name: work_type
-        type: string
+        type: integer
       - description: 页码，从1开始 必填
         in: query
         name: page
         required: true
-        type: string
+        type: integer
       - description: 每页记录数 必填
         in: query
         name: limit
         required: true
-        type: string
+        type: integer
       produces:
       - application/json
       responses:
@@ -478,5 +478,5 @@ paths:
             type: object
       summary: 搜索工作
       tags:
-      - wx
+      - 工作相关
 swagger: "2.0"

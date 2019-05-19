@@ -50,11 +50,11 @@ func NewGroupKey() string {
 	return newGroupKey
 }
 
-// NewGroup 创建新群组
-// @Summary 创建新群组
-// @Description 创建新群组
-// @Tags wx
-// @Param user body model.GroupRequest true "create a new group"
+// NewGroup 创建新班组
+// @Summary 创建新班组
+// @Description 创建新班组
+// @Tags 班组相关
+// @Param user body model.GroupRequest true "创建新班组"
 // @Accept json
 // @Produce json
 // @Success 200 {object} controller.Message
@@ -90,11 +90,11 @@ func NewGroup(c *gin.Context) {
 	})
 }
 
-// JoinGroup 加入群组
-// @Summary 加入群组
-// @Description 加入群组
-// @Tags wx
-// @Param user_id query string true "用户id"
+// JoinGroup 加入班组
+// @Summary 加入班组
+// @Description 加入班组
+// @Tags 班组相关
+// @Param user_id query int true "用户id"
 // @Param group_key query string true "群组入群口令"
 // @Accept json
 // @Produce json
@@ -123,7 +123,7 @@ func JoinGroup(c *gin.Context) {
 	}
 
 	groupID := existGroup.ID
-	// 检查是否已经在群组
+	// 检查是否已经在班组
 	var existGroupMember model.GroupMember
 	db.Where("group_id = ? AND member_id = ?", groupID, userID).First(&existGroupMember)
 	if common.FuncHandler(c, existGroupMember.ID == 0, true, 50001) {
@@ -147,15 +147,15 @@ func JoinGroup(c *gin.Context) {
 	tx.Commit()
 
 	c.JSON(http.StatusOK, controller.Message{
-		Data: "加入群组成功",
+		Data: "加入班组成功",
 	})
 }
 
 // InGroup 查询自己参与的班组
 // @Summary 查询自己参与的班组
 // @Description 查询自己参与的班组，包括自己创建和加入的
-// @Tags wx
-// @Param user_id query string true "用户id"
+// @Tags 班组相关
+// @Param user_id query int true "用户id"
 // @Accept json
 // @Produce json
 // @Success 200 {object} controller.Message
@@ -169,7 +169,7 @@ func InGroup(c *gin.Context) {
 	db := common.GetMySQL()
 	var groupInfos []model.GroupInfo
 
-	// 查询自己创建的群组
+	// 查询自己创建的班组
 	var groups []model.Group
 	err = db.Where("owner_id = ?", userID).Find(&groups).Error
 
@@ -192,7 +192,7 @@ func InGroup(c *gin.Context) {
 			groupInfos = append(groupInfos, groupInfo)
 		}
 	}
-	// 查询自己参与的群组
+	// 查询自己参与的班组
 	var groupMembers []model.GroupMember
 	err = db.Where("member_id = ?", userID).Find(&groupMembers).Error
 
@@ -230,11 +230,11 @@ func InGroup(c *gin.Context) {
 	})
 }
 
-// GroupMember 班组所有成员
-// @Summary 班组所有成员
-// @Description 班组所有成员
-// @Tags wx
-// @Param group_id query string true "班组id"
+// GroupMember 获取班组所有成员
+// @Summary 获取班组所有成员
+// @Description 获取班组所有成员
+// @Tags 班组相关
+// @Param group_id query int true "班组id"
 // @Accept json
 // @Produce json
 // @Success 200 {object} controller.Message
@@ -267,7 +267,7 @@ func GroupMember(c *gin.Context) {
 	groupMemberInfo.WxUser = user
 	groupMemberInfos = append(groupMemberInfos, groupMemberInfo)
 
-	// 群成员信息
+	// 班组成员信息
 	var groupMembers []model.GroupMember
 	err = db.Where("group_id = ?", groupID).Find(&groupMembers).Error
 	if err == nil {
@@ -295,9 +295,9 @@ func GroupMember(c *gin.Context) {
 // DeleteMember 删除班组中某个成员
 // @Summary 删除班组中某个成员
 // @Description 删除班组中某个成员
-// @Tags wx
-// @Param group_id query string true "班组id"
-// @Param user_id query string true "删除用户id"
+// @Tags 班组相关
+// @Param group_id query int true "班组id"
+// @Param user_id query int true "删除用户id"
 // @Accept json
 // @Produce json
 // @Success 200 {object} controller.Message
