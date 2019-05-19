@@ -16,6 +16,6 @@ import (
 // @Router /ping [get]
 func Ping(c *gin.Context) {
 	c.JSON(http.StatusOK, Message{
-		Data: "pong",
+		Msg: "pong",
 	})
 }

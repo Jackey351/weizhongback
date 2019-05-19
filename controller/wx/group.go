@@ -148,7 +148,7 @@ func JoinGroup(c *gin.Context) {
 	tx.Commit()
 
 	c.JSON(http.StatusOK, controller.Message{
-		Data: "加入班组成功",
+		Msg: "加入班组成功",
 	})
 }
 
@@ -329,6 +329,6 @@ func DeleteMember(c *gin.Context) {
 
 	tx.Commit()
 	c.JSON(http.StatusOK, controller.Message{
-		Data: "删除成功",
+		Msg: "删除成功",
 	})
 }

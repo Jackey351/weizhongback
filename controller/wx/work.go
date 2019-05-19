@@ -97,7 +97,7 @@ func PublishWork(c *gin.Context) {
 
 		tx.Commit()
 		c.JSON(http.StatusOK, controller.Message{
-			Data: "发布成功",
+			Msg: "发布成功",
 		})
 
 		break
