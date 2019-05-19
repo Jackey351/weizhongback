@@ -81,6 +81,7 @@ func main() {
 	r.GET("/wx/group/delete_member", wx.DeleteMember)
 	// 工作记录相关
 	r.POST("/wx/record/add_hour_record", wx.AddHourRecord)
+	r.POST("/wx/record/add_item_record", wx.AddItemRecord)
 
 	r.Run("0.0.0.0:" + viper.GetString("basic.port"))
 }

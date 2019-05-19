@@ -30,3 +30,17 @@ type HourRecordRequest struct {
 	WorkHours      float64 `json:"work_hours" example:"1.5"`
 	ExtraWorkHours float64 `json:"extra_work_hours" example:"1"`
 }
+
+// ItemRecord 分项记录数据库字段
+type ItemRecord struct {
+	ID       int64   `json:"id"`
+	Subitem  string  `json:"subitem" example:"刷墙"`
+	Quantity float64 `json:"quantity" example:"1"`
+}
+
+// ItemRecordRequest 分项记录请求头
+type ItemRecordRequest struct {
+	CommonRecord
+	Subitem  string  `json:"subitem" example:"刷墙"`
+	Quantity float64 `json:"quantity" example:"1"`
+}

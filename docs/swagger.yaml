@@ -80,6 +80,27 @@ definitions:
         example: 2
         type: integer
     type: object
+  model.ItemRecordRequest:
+    properties:
+      adder_id:
+        example: 1
+        type: integer
+      group_id:
+        example: 1
+        type: integer
+      quantity:
+        example: 1
+        type: number
+      record_date:
+        example: "2019-05-19"
+        type: string
+      subitem:
+        example: 刷墙
+        type: string
+      worker_id:
+        example: 2
+        type: integer
+    type: object
   model.LocationInfoWrapper:
     properties:
       addr:
@@ -311,7 +332,29 @@ paths:
             type: object
       summary: 添加工时记录
       tags:
-      - 工时
+      - 工作记录
+  /wx/record/add_item_record:
+    post:
+      description: 添加分项记录
+      parameters:
+      - description: 分项记录数据
+        in: body
+        name: 分项记录数据
+        required: true
+        schema:
+          $ref: '#/definitions/model.ItemRecordRequest'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.Message'
+            type: object
+      summary: 添加分项记录
+      tags:
+      - 工作记录
   /wx/user/new_user:
     post:
       consumes:

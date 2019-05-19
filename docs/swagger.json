@@ -265,7 +265,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "工时"
+                    "工作记录"
                 ],
                 "summary": "添加工时记录",
                 "parameters": [
@@ -277,6 +277,39 @@
                         "schema": {
                             "type": "object",
                             "$ref": "#/definitions/model.HourRecordRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/controller.Message"
+                        }
+                    }
+                }
+            }
+        },
+        "/wx/record/add_item_record": {
+            "post": {
+                "description": "添加分项记录",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "工作记录"
+                ],
+                "summary": "添加分项记录",
+                "parameters": [
+                    {
+                        "description": "分项记录数据",
+                        "name": "分项记录数据",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/model.ItemRecordRequest"
                         }
                     }
                 ],
@@ -539,6 +572,35 @@
                 "work_hours": {
                     "type": "number",
                     "example": 1.5
+                },
+                "worker_id": {
+                    "type": "integer",
+                    "example": 2
+                }
+            }
+        },
+        "model.ItemRecordRequest": {
+            "type": "object",
+            "properties": {
+                "adder_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "group_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "quantity": {
+                    "type": "number",
+                    "example": 1
+                },
+                "record_date": {
+                    "type": "string",
+                    "example": "2019-05-19"
+                },
+                "subitem": {
+                    "type": "string",
+                    "example": "刷墙"
                 },
                 "worker_id": {
                     "type": "integer",
