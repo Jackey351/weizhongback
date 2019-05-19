@@ -7,8 +7,8 @@ type Group struct {
 	GroupKey string `json:"group_key"`
 }
 
-// GroupInfo 详细的班组数据，多了创建者信息
-type GroupInfo struct {
+// GroupRet 详细的班组数据，多了创建者信息
+type GroupRet struct {
 	ID        int64  `json:"id"`
 	GroupName string `json:"group_name"`
 	Owner     WxUser `json:"owner"`
@@ -28,8 +28,8 @@ type GroupMember struct {
 	MemberID int64 `json:"member_id"`
 }
 
-// GroupMemberInfo 群组成员详细信息
-type GroupMemberInfo struct {
+// GroupMemberRet 群组成员详细信息
+type GroupMemberRet struct {
 	WxUser
 	IsOwner bool `json:"is_owner"`
 }

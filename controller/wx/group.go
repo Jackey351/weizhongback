@@ -110,23 +110,24 @@ func JoinGroup(c *gin.Context) {
 	db := common.GetMySQL()
 	// 检查userID是否存在
 	var existUser model.WxUser
-	db.First(&existUser, userID)
-	if common.FuncHandler(c, existUser.ID != 0, true, common.UserNoExist) {
+	err = db.First(&existUser, userID).Error
+	// 找不到数据
+	if common.FuncHandler(c, err, nil, common.DatabaseError) {
 		return
 	}
 
 	// 检查groupKey是否存在
 	var existGroup model.Group
-	db.Where("group_key = ?", groupKey).First(&existGroup)
-	if common.FuncHandler(c, existGroup.ID != 0, true, common.GroupNoExist) {
+	err = db.Where("group_key = ?", groupKey).First(&existGroup).Error
+	if common.FuncHandler(c, err, nil, common.DatabaseError) {
 		return
 	}
 
 	groupID := existGroup.ID
 	// 检查是否已经在班组
 	var existGroupMember model.GroupMember
-	db.Where("group_id = ? AND member_id = ?", groupID, userID).First(&existGroupMember)
-	if common.FuncHandler(c, existGroupMember.ID == 0, true, common.HasInGroup) {
+	err = db.Where("group_id = ? AND member_id = ?", groupID, userID).First(&existGroupMember).Error
+	if common.FuncHandler(c, err, nil, common.DatabaseError) {
 		return
 	}
 
@@ -167,7 +168,7 @@ func InGroup(c *gin.Context) {
 	}
 
 	db := common.GetMySQL()
-	var groupInfos []model.GroupInfo
+	var groupRets []model.GroupRet
 
 	// 查询自己创建的班组
 	var groups []model.Group
@@ -175,10 +176,10 @@ func InGroup(c *gin.Context) {
 
 	if err == nil {
 		for _, group := range groups {
-			var groupInfo model.GroupInfo
-			groupInfo.ID = group.ID
-			groupInfo.GroupName = group.GroupName
-			groupInfo.IsOwner = true
+			var groupRet model.GroupRet
+			groupRet.ID = group.ID
+			groupRet.GroupName = group.GroupName
+			groupRet.IsOwner = true
 			ownerID := group.OwnerID
 
 			var owner model.WxUser
@@ -188,8 +189,8 @@ func InGroup(c *gin.Context) {
 				return
 			}
 
-			groupInfo.Owner = owner
-			groupInfos = append(groupInfos, groupInfo)
+			groupRet.Owner = owner
+			groupRets = append(groupRets, groupRet)
 		}
 	}
 	// 查询自己参与的班组
@@ -207,10 +208,10 @@ func InGroup(c *gin.Context) {
 				return
 			}
 
-			var groupInfo model.GroupInfo
-			groupInfo.ID = group.ID
-			groupInfo.GroupName = group.GroupName
-			groupInfo.IsOwner = false
+			var groupRet model.GroupRet
+			groupRet.ID = group.ID
+			groupRet.GroupName = group.GroupName
+			groupRet.IsOwner = false
 			ownerID := group.OwnerID
 
 			var owner model.WxUser
@@ -220,13 +221,13 @@ func InGroup(c *gin.Context) {
 				return
 			}
 
-			groupInfo.Owner = owner
-			groupInfos = append(groupInfos, groupInfo)
+			groupRet.Owner = owner
+			groupRets = append(groupRets, groupRet)
 		}
 	}
 
 	c.JSON(http.StatusOK, controller.Message{
-		Data: groupInfos,
+		Data: groupRets,
 	})
 }
 
@@ -246,7 +247,7 @@ func GroupMember(c *gin.Context) {
 	}
 
 	db := common.GetMySQL()
-	var groupMemberInfos []model.GroupMemberInfo
+	var groupMemberRets []model.GroupMemberRet
 
 	// 群主信息
 	var group model.Group
@@ -262,10 +263,10 @@ func GroupMember(c *gin.Context) {
 	if common.FuncHandler(c, err, nil, common.DatabaseError) {
 		return
 	}
-	var groupMemberInfo model.GroupMemberInfo
-	groupMemberInfo.IsOwner = true
-	groupMemberInfo.WxUser = user
-	groupMemberInfos = append(groupMemberInfos, groupMemberInfo)
+	var groupMemberRet model.GroupMemberRet
+	groupMemberRet.IsOwner = true
+	groupMemberRet.WxUser = user
+	groupMemberRets = append(groupMemberRets, groupMemberRet)
 
 	// 班组成员信息
 	var groupMembers []model.GroupMember
@@ -280,15 +281,15 @@ func GroupMember(c *gin.Context) {
 			if common.FuncHandler(c, err, nil, common.DatabaseError) {
 				return
 			}
-			var groupMemberInfo model.GroupMemberInfo
-			groupMemberInfo.IsOwner = false
-			groupMemberInfo.WxUser = user
-			groupMemberInfos = append(groupMemberInfos, groupMemberInfo)
+			var groupMemberRet model.GroupMemberRet
+			groupMemberRet.IsOwner = false
+			groupMemberRet.WxUser = user
+			groupMemberRets = append(groupMemberRets, groupMemberRet)
 		}
 	}
 
 	c.JSON(http.StatusOK, controller.Message{
-		Data: groupMemberInfos,
+		Data: groupMemberRets,
 	})
 }
 
