@@ -291,3 +291,43 @@ func GroupMember(c *gin.Context) {
 		Data: groupMemberInfos,
 	})
 }
+
+// DeleteMember 删除班组中某个成员
+// @Summary 删除班组中某个成员
+// @Description 删除班组中某个成员
+// @Tags wx
+// @Param group_id query string true "班组id"
+// @Param user_id query string true "删除用户id"
+// @Accept json
+// @Produce json
+// @Success 200 {object} controller.Message
+// @Router /wx/group/delete_member [get]
+func DeleteMember(c *gin.Context) {
+	var groupID int64
+	var userID int64
+	var err error
+
+	groupID, err = strconv.ParseInt(c.Query("group_id"), 10, 64)
+	if common.FuncHandler(c, err, nil, 20001) {
+		return
+	}
+	userID, err = strconv.ParseInt(c.Query("user_id"), 10, 64)
+	if common.FuncHandler(c, err, nil, 20001) {
+		return
+	}
+
+	db := common.GetMySQL()
+	tx := db.Begin()
+
+	err = db.Delete(model.GroupMember{}, "group_id = ? AND member_id = ?", groupID, userID).Error
+
+	if common.FuncHandler(c, err, nil, 20002) {
+		tx.Rollback()
+		return
+	}
+
+	tx.Commit()
+	c.JSON(http.StatusOK, controller.Message{
+		Data: "删除成功",
+	})
+}

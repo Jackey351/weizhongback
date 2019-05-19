@@ -78,6 +78,7 @@ func main() {
 	r.GET("/wx/group/join_group", wx.JoinGroup)
 	r.GET("/wx/group/in_group", wx.InGroup)
 	r.GET("/wx/group/group_member", wx.GroupMember)
+	r.GET("/wx/group/delete_member", wx.DeleteMember)
 
 	r.Run("0.0.0.0:" + viper.GetString("basic.port"))
 }

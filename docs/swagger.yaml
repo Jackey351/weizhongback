@@ -119,6 +119,33 @@ paths:
       summary: PING-PONG
       tags:
       - miscellaneous
+  /wx/group/delete_member:
+    get:
+      consumes:
+      - application/json
+      description: 删除班组中某个成员
+      parameters:
+      - description: 班组id
+        in: query
+        name: group_id
+        required: true
+        type: string
+      - description: 删除用户id
+        in: query
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.Message'
+            type: object
+      summary: 删除班组中某个成员
+      tags:
+      - wx
   /wx/group/group_member:
     get:
       consumes:
