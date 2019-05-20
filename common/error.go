@@ -156,6 +156,10 @@ const (
 	ResourceUnavailable = 10005
 	CSRFError           = 10006
 	Maintenance         = 10007
+	NoToken             = 10008
+	TokenExpired        = 10009
+	TokenInvalid        = 10010
+	InvalidLogin        = 10011
 
 	ProjectTypeNoExist = 20000
 	WorkTypeNoExist    = 20001
@@ -181,6 +185,10 @@ var Errors = map[int]string{
 	ResourceUnavailable: "Resource unavailable",
 	CSRFError:           "CSRF token mismatch",
 	Maintenance:         "This service is undergoing maintenance",
+	NoToken:             "No token",
+	TokenExpired:        "Token is expired",
+	TokenInvalid:        "Token is invalid",
+	InvalidLogin:        "Invalid login",
 
 	// 工作相关
 	ProjectTypeNoExist: "不存在该工程类别",

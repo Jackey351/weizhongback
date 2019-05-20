@@ -16,3 +16,7 @@ storage:
     retry_interval: 20
 log:
   file: "log/example.log"
+wechat:
+  app_id: wx1234567
+  app_secret: 1234567
+  salt: 666

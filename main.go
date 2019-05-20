@@ -59,6 +59,7 @@ func main() {
 	// middleware
 	r.Use(common.ErrorHandling())
 	r.Use(common.MaintenanceHandling())
+	r.Use(common.JWTAuth())
 
 	// swagger router
 	if viper.GetBool("basic.debug") {
@@ -68,7 +69,10 @@ func main() {
 	// 路由
 	r.GET("/ping", controller.Ping)
 	// 小程序路由
-	r.POST("/wx/user/new_user", wx.NewWxUser)
+	r.POST("/wx/user/update_user_info", wx.UpdateInfo)
+	r.GET("/wx/user/login", wx.Login)
+	r.GET("/wx/user/get_user_info", wx.GetUserInfo)
+
 	r.GET("/wx/info/worker_types", wx.GetWokerType)
 	r.GET("/wx/info/project_types", wx.GetProjectType)
 	// 工作相关

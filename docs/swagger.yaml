@@ -205,7 +205,7 @@ definitions:
         example: "8"
         type: string
     type: object
-  model.WxUserWrapper:
+  model.WxUserInfo:
     properties:
       hometown:
         example: 江苏
@@ -221,9 +221,6 @@ definitions:
         type: string
       sex:
         example: 男
-        type: string
-      wx_id:
-        example: jajsjasja11233
         type: string
     type: object
 host: '{{.Host}}'
@@ -474,18 +471,67 @@ paths:
       summary: 检查某日是否记录
       tags:
       - 工作记录相关
-  /wx/user/new_user:
+  /wx/user/get_user_info:
+    get:
+      consumes:
+      - application/json
+      description: 获取用户信息
+      parameters:
+      - description: token
+        in: header
+        name: token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.Message'
+            type: object
+      summary: 获取用户信息
+      tags:
+      - 用户相关
+  /wx/user/login:
+    get:
+      consumes:
+      - application/json
+      description: 小程序用户登录
+      parameters:
+      - description: 登录码
+        in: query
+        name: code
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.Message'
+            type: object
+      summary: 小程序用户登录
+      tags:
+      - 用户相关
+  /wx/user/update_user_info:
     post:
       consumes:
       - application/json
-      description: 小程序端新添用户
+      description: 更新用户信息
       parameters:
-      - description: create a new user
+      - description: token
+        in: header
+        name: token
+        required: true
+        type: string
+      - description: 用户个人信息
         in: body
         name: user
         required: true
         schema:
-          $ref: '#/definitions/model.WxUserWrapper'
+          $ref: '#/definitions/model.WxUserInfo'
           type: object
       produces:
       - application/json
@@ -495,7 +541,7 @@ paths:
           schema:
             $ref: '#/definitions/controller.Message'
             type: object
-      summary: 小程序端新添用户
+      summary: 更新用户信息
       tags:
       - 用户相关
   /wx/work/publish_bao:

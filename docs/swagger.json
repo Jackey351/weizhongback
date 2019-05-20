@@ -368,9 +368,9 @@
                 }
             }
         },
-        "/wx/user/new_user": {
-            "post": {
-                "description": "小程序端新添用户",
+        "/wx/user/get_user_info": {
+            "get": {
+                "description": "获取用户信息",
                 "consumes": [
                     "application/json"
                 ],
@@ -380,16 +380,89 @@
                 "tags": [
                     "用户相关"
                 ],
-                "summary": "小程序端新添用户",
+                "summary": "获取用户信息",
                 "parameters": [
                     {
-                        "description": "create a new user",
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/controller.Message"
+                        }
+                    }
+                }
+            }
+        },
+        "/wx/user/login": {
+            "get": {
+                "description": "小程序用户登录",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "用户相关"
+                ],
+                "summary": "小程序用户登录",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "登录码",
+                        "name": "code",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/controller.Message"
+                        }
+                    }
+                }
+            }
+        },
+        "/wx/user/update_user_info": {
+            "post": {
+                "description": "更新用户信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "用户相关"
+                ],
+                "summary": "更新用户信息",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "用户个人信息",
                         "name": "user",
                         "in": "body",
                         "required": true,
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/model.WxUserWrapper"
+                            "$ref": "#/definitions/model.WxUserInfo"
                         }
                     }
                 ],
@@ -860,7 +933,7 @@
                 }
             }
         },
-        "model.WxUserWrapper": {
+        "model.WxUserInfo": {
             "type": "object",
             "properties": {
                 "hometown": {
@@ -882,10 +955,6 @@
                 "sex": {
                     "type": "string",
                     "example": "男"
-                },
-                "wx_id": {
-                    "type": "string",
-                    "example": "jajsjasja11233"
                 }
             }
         }
