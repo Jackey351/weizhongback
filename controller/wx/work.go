@@ -23,12 +23,20 @@ const (
 // @Summary 发布点工工作
 // @Description 发布点工工作
 // @Tags 工作相关
+// @Param token header string true "token"
 // @Param dian_work body model.DianWorkReq true "点工招聘数据"
 // @Accept json
 // @Produce json
 // @Success 200 {object} controller.Message
 // @Router /wx/work/publish_dian [post]
 func PublishDianWork(c *gin.Context) {
+	claims, exist := c.Get("claims")
+	// 获取数据失败
+	if common.FuncHandler(c, exist, true, common.SystemError) {
+		return
+	}
+	userID := claims.(*model.CustomClaims).UserID
+
 	var dianWorkReq model.DianWorkReq
 	if common.FuncHandler(c, c.BindJSON(&dianWorkReq), nil, common.ParameterError) {
 		return
@@ -37,7 +45,7 @@ func PublishDianWork(c *gin.Context) {
 	db := common.GetMySQL()
 
 	// 检查userID是否存在
-	if _, ok := UserExist(c, dianWorkReq.UserID).(model.WxUser); !ok {
+	if _, ok := UserExist(c, userID).(model.WxUser); !ok {
 		return
 	}
 
@@ -83,6 +91,7 @@ func PublishDianWork(c *gin.Context) {
 	}
 
 	var work model.Work
+	work.UserID = userID
 	work.BasicWork = dianWorkReq.WorkReq.BasicWork
 	work.LocationID = locationInfo.ID
 	work.Treatment = strings.Join(dianWorkReq.WorkReq.Treatment, ",")
@@ -108,12 +117,20 @@ func PublishDianWork(c *gin.Context) {
 // @Summary 发布包工工作
 // @Description 发布包工工作
 // @Tags 工作相关
+// @Param token header string true "token"
 // @Param bao_work body model.BaoWorkReq true "包工招聘数据"
 // @Accept json
 // @Produce json
 // @Success 200 {object} controller.Message
 // @Router /wx/work/publish_bao [post]
 func PublishBaoWork(c *gin.Context) {
+	claims, exist := c.Get("claims")
+	// 获取数据失败
+	if common.FuncHandler(c, exist, true, common.SystemError) {
+		return
+	}
+	userID := claims.(*model.CustomClaims).UserID
+
 	var baoWorkReq model.BaoWorkReq
 	if common.FuncHandler(c, c.BindJSON(&baoWorkReq), nil, common.ParameterError) {
 		return
@@ -122,7 +139,7 @@ func PublishBaoWork(c *gin.Context) {
 	db := common.GetMySQL()
 
 	// 检查userID是否存在
-	if _, ok := UserExist(c, baoWorkReq.UserID).(model.WxUser); !ok {
+	if _, ok := UserExist(c, userID).(model.WxUser); !ok {
 		return
 	}
 
@@ -168,6 +185,7 @@ func PublishBaoWork(c *gin.Context) {
 	}
 
 	var work model.Work
+	work.UserID = userID
 	work.BasicWork = baoWorkReq.WorkReq.BasicWork
 	work.LocationID = locationInfo.ID
 	work.Treatment = strings.Join(baoWorkReq.WorkReq.Treatment, ",")
@@ -194,12 +212,20 @@ func PublishBaoWork(c *gin.Context) {
 // @Summary 发布突击队工作
 // @Description 发布突击队工作
 // @Tags 工作相关
+// @Param token header string true "token"
 // @Param tuji_work body model.TujiWorkReq true "突击队招聘数据"
 // @Accept json
 // @Produce json
 // @Success 200 {object} controller.Message
 // @Router /wx/work/publish_tuji [post]
 func PublishTujiWork(c *gin.Context) {
+	claims, exist := c.Get("claims")
+	// 获取数据失败
+	if common.FuncHandler(c, exist, true, common.SystemError) {
+		return
+	}
+	userID := claims.(*model.CustomClaims).UserID
+
 	var tujiWorkReq model.TujiWorkReq
 	if common.FuncHandler(c, c.BindJSON(&tujiWorkReq), nil, common.ParameterError) {
 		return
@@ -208,7 +234,7 @@ func PublishTujiWork(c *gin.Context) {
 	db := common.GetMySQL()
 
 	// 检查userID是否存在
-	if _, ok := UserExist(c, tujiWorkReq.UserID).(model.WxUser); !ok {
+	if _, ok := UserExist(c, userID).(model.WxUser); !ok {
 		return
 	}
 
@@ -255,6 +281,7 @@ func PublishTujiWork(c *gin.Context) {
 
 	var work model.Work
 	work.BasicWork = tujiWorkReq.WorkReq.BasicWork
+	work.UserID = userID
 	work.LocationID = locationInfo.ID
 	work.Treatment = strings.Join(tujiWorkReq.WorkReq.Treatment, ",")
 	work.Fid = tujiWork.ID
@@ -279,6 +306,7 @@ func PublishTujiWork(c *gin.Context) {
 // @Summary 搜索工作
 // @Description 搜索工作，需要某个筛选参数就加上，否则可以不加；按发布时间降序排序
 // @Tags 工作相关
+// @Param token header string true "token"
 // @Param location query string false "二级位置信息 选填"
 // @Param need query string false "所需工种 选填"
 // @Param type query string false "工程类别 选填"
@@ -376,6 +404,7 @@ func SearchWork(c *gin.Context) {
 			switch work.PricingMode {
 			case DianWork:
 				var dianWorkRet model.DianWorkRet
+				dianWorkRet.UserID = work.UserID
 				dianWorkRet.ID = work.ID
 				dianWorkRet.BasicWork = work.BasicWork
 				dianWorkRet.Treatment = strings.Split(work.Treatment, ",")
@@ -407,6 +436,7 @@ func SearchWork(c *gin.Context) {
 
 			case BaoWork:
 				var baoWorkRet model.BaoWorkRet
+				baoWorkRet.UserID = work.UserID
 				baoWorkRet.ID = work.ID
 				baoWorkRet.BasicWork = work.BasicWork
 				baoWorkRet.Treatment = strings.Split(work.Treatment, ",")
@@ -436,6 +466,7 @@ func SearchWork(c *gin.Context) {
 				break
 			case TujiWork:
 				var tujiWorkRet model.TujiWorkRet
+				tujiWorkRet.UserID = work.UserID
 				tujiWorkRet.ID = work.ID
 				tujiWorkRet.BasicWork = work.BasicWork
 				tujiWorkRet.Treatment = strings.Split(work.Treatment, ",")

@@ -22,7 +22,6 @@ type BasicWork struct {
 	WorkerType          string `json:"need" example:"钢筋工"`
 	ProjectName         string `json:"project_name" example:"主楼建造"`
 	ProjectType         string `json:"type" example:"消防"`
-	UserID              int64  `json:"user_id" example:"1"`
 }
 
 // WorkReq 通用工作请求字段
@@ -34,7 +33,8 @@ type WorkReq struct {
 
 // Work 与数据表work字段对应
 type Work struct {
-	ID int64 `json:"work_id"`
+	ID     int64 `json:"work_id"`
+	UserID int64 `json:"user_id"`
 	BasicWork
 	PricingMode int64  `json:"pricing_mode"`
 	PublishTime int64  `json:"publish_time"`
@@ -45,7 +45,8 @@ type Work struct {
 
 // DianWorkRet 点工返回字段
 type DianWorkRet struct {
-	ID int64 `json:"work_id"`
+	ID     int64 `json:"work_id"`
+	UserID int64 `json:"user_id"`
 	BasicWork
 	PricingMode     int64           `json:"pricing_mode"`
 	PublishTime     int64           `json:"publish_time"`
@@ -56,7 +57,8 @@ type DianWorkRet struct {
 
 // BaoWorkRet 包工返回字段
 type BaoWorkRet struct {
-	ID int64 `json:"work_id"`
+	ID     int64 `json:"work_id"`
+	UserID int64 `json:"user_id"`
 	BasicWork
 	PricingMode     int64           `json:"pricing_mode"`
 	PublishTime     int64           `json:"publish_time"`
@@ -67,7 +69,8 @@ type BaoWorkRet struct {
 
 // TujiWorkRet 突击队返回字段
 type TujiWorkRet struct {
-	ID int64 `json:"work_id"`
+	ID     int64 `json:"work_id"`
+	UserID int64 `json:"user_id"`
 	BasicWork
 	PricingMode     int64           `json:"pricing_mode"`
 	PublishTime     int64           `json:"publish_time"`

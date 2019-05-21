@@ -552,6 +552,13 @@
                 "summary": "发布包工工作",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "description": "包工招聘数据",
                         "name": "bao_work",
                         "in": "body",
@@ -587,6 +594,13 @@
                 ],
                 "summary": "发布点工工作",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "description": "点工招聘数据",
                         "name": "dian_work",
@@ -624,6 +638,13 @@
                 "summary": "发布突击队工作",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "description": "突击队招聘数据",
                         "name": "tuji_work",
                         "in": "body",
@@ -656,6 +677,13 @@
                 ],
                 "summary": "搜索工作",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "string",
                         "description": "二级位置信息 选填",
@@ -774,10 +802,6 @@
                 "unit_price": {
                     "type": "string",
                     "example": "2"
-                },
-                "user_id": {
-                    "type": "integer",
-                    "example": 1
                 }
             }
         },
@@ -833,10 +857,6 @@
                 "type": {
                     "type": "string",
                     "example": "消防"
-                },
-                "user_id": {
-                    "type": "integer",
-                    "example": 1
                 }
             }
         },
@@ -963,10 +983,6 @@
                 "type": {
                     "type": "string",
                     "example": "消防"
-                },
-                "user_id": {
-                    "type": "integer",
-                    "example": 1
                 },
                 "work_date": {
                     "type": "string",
