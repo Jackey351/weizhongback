@@ -2,22 +2,22 @@ package model
 
 // Group 群组数据库字段
 type Group struct {
-	ID int64 `json:"id"`
+	ID      int64 `json:"id"`
+	OwnerID int64 `json:"owner_id"`
 	GroupRequest
 	GroupKey string `json:"group_key"`
 }
 
 // GroupRet 详细的班组数据，多了创建者信息
 type GroupRet struct {
-	ID        int64  `json:"id"`
-	GroupName string `json:"group_name"`
-	Owner     WxUser `json:"owner"`
-	IsOwner   bool   `json:"is_owner"`
+	ID        int64      `json:"id"`
+	GroupName string     `json:"group_name"`
+	Owner     WxUserInfo `json:"owner"`
+	IsOwner   bool       `json:"is_owner"`
 }
 
 // GroupRequest 群组请求字段
 type GroupRequest struct {
-	OwnerID   int64  `json:"owner_id"`
 	GroupName string `json:"group_name"`
 }
 
@@ -30,6 +30,6 @@ type GroupMember struct {
 
 // GroupMemberRet 群组成员详细信息
 type GroupMemberRet struct {
-	WxUser
+	WxUserInfo
 	IsOwner bool `json:"is_owner"`
 }

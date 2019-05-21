@@ -49,6 +49,13 @@
                 "summary": "删除班组中某个成员",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "type": "integer",
                         "description": "班组id",
                         "name": "group_id",
@@ -89,6 +96,13 @@
                 "summary": "获取班组所有成员",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "type": "integer",
                         "description": "班组id",
                         "name": "group_id",
@@ -122,10 +136,10 @@
                 "summary": "查询自己参与的班组",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "用户id",
-                        "name": "user_id",
-                        "in": "query",
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "header",
                         "required": true
                     }
                 ],
@@ -155,10 +169,10 @@
                 "summary": "加入班组",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "用户id",
-                        "name": "user_id",
-                        "in": "query",
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "header",
                         "required": true
                     },
                     {
@@ -194,6 +208,13 @@
                 ],
                 "summary": "创建新班组",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "description": "创建新班组",
                         "name": "user",
@@ -824,9 +845,6 @@
             "properties": {
                 "group_name": {
                     "type": "string"
-                },
-                "owner_id": {
-                    "type": "integer"
                 }
             }
         },

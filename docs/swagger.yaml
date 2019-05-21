@@ -99,8 +99,6 @@ definitions:
     properties:
       group_name:
         type: string
-      owner_id:
-        type: integer
     type: object
   model.HourRecordRequest:
     properties:
@@ -247,6 +245,11 @@ paths:
       - application/json
       description: 删除班组中某个成员
       parameters:
+      - description: token
+        in: header
+        name: token
+        required: true
+        type: string
       - description: 班组id
         in: query
         name: group_id
@@ -274,6 +277,11 @@ paths:
       - application/json
       description: 获取班组所有成员
       parameters:
+      - description: token
+        in: header
+        name: token
+        required: true
+        type: string
       - description: 班组id
         in: query
         name: group_id
@@ -296,11 +304,11 @@ paths:
       - application/json
       description: 查询自己参与的班组，包括自己创建和加入的
       parameters:
-      - description: 用户id
-        in: query
-        name: user_id
+      - description: token
+        in: header
+        name: token
         required: true
-        type: integer
+        type: string
       produces:
       - application/json
       responses:
@@ -318,11 +326,11 @@ paths:
       - application/json
       description: 加入班组
       parameters:
-      - description: 用户id
-        in: query
-        name: user_id
+      - description: token
+        in: header
+        name: token
         required: true
-        type: integer
+        type: string
       - description: 群组入群口令
         in: query
         name: group_key
@@ -345,6 +353,11 @@ paths:
       - application/json
       description: 创建新班组
       parameters:
+      - description: token
+        in: header
+        name: token
+        required: true
+        type: string
       - description: 创建新班组
         in: body
         name: user

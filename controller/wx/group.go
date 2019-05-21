@@ -50,50 +50,6 @@ func NewGroupKey() string {
 	return newGroupKey
 }
 
-// NewGroup 创建新班组
-// @Summary 创建新班组
-// @Description 创建新班组
-// @Tags 班组相关
-// @Param user body model.GroupRequest true "创建新班组"
-// @Accept json
-// @Produce json
-// @Success 200 {object} controller.Message
-// @Router /wx/group/new_group [post]
-func NewGroup(c *gin.Context) {
-	var groupReq model.GroupRequest
-
-	// 获取数据失败
-	if common.FuncHandler(c, c.BindJSON(&groupReq), nil, common.ParameterError) {
-		return
-	}
-
-	if _, ok := UserExist(c, groupReq.OwnerID).(model.WxUser); !ok {
-		return
-	}
-
-	var newGroup model.Group
-	newGroup.GroupName = groupReq.GroupName
-	newGroup.OwnerID = groupReq.OwnerID
-	newGroup.GroupKey = NewGroupKey()
-
-	db := common.GetMySQL()
-	tx := db.Begin()
-
-	err := tx.Create(&newGroup).Error
-	// 数据库错误
-	if common.FuncHandler(c, err, nil, common.DatabaseError) {
-		// 发生错误时回滚事务
-		tx.Rollback()
-		return
-	}
-
-	tx.Commit()
-
-	c.JSON(http.StatusOK, controller.Message{
-		Data: newGroup,
-	})
-}
-
 // GroupExistByID 根据班组id判断班组是否存在，不存在直接返回GroupNoExist
 func GroupExistByID(c *gin.Context, groupID int64) interface{} {
 	db := common.GetMySQL()
@@ -120,21 +76,76 @@ func GroupExistByKey(c *gin.Context, groupKey string) interface{} {
 	return existGroup
 }
 
+// NewGroup 创建新班组
+// @Summary 创建新班组
+// @Description 创建新班组
+// @Tags 班组相关
+// @Param token header string true "token"
+// @Param user body model.GroupRequest true "创建新班组"
+// @Accept json
+// @Produce json
+// @Success 200 {object} controller.Message
+// @Router /wx/group/new_group [post]
+func NewGroup(c *gin.Context) {
+	claims, exist := c.Get("claims")
+	// 获取数据失败
+	if common.FuncHandler(c, exist, true, common.SystemError) {
+		return
+	}
+	userID := claims.(*model.CustomClaims).UserID
+
+	var groupReq model.GroupRequest
+
+	// 获取数据失败
+	if common.FuncHandler(c, c.BindJSON(&groupReq), nil, common.ParameterError) {
+		return
+	}
+
+	if _, ok := UserExist(c, userID).(model.WxUser); !ok {
+		return
+	}
+
+	var newGroup model.Group
+	newGroup.GroupName = groupReq.GroupName
+	newGroup.OwnerID = userID
+	newGroup.GroupKey = NewGroupKey()
+
+	db := common.GetMySQL()
+	tx := db.Begin()
+
+	err := tx.Create(&newGroup).Error
+	// 数据库错误
+	if common.FuncHandler(c, err, nil, common.DatabaseError) {
+		// 发生错误时回滚事务
+		tx.Rollback()
+		return
+	}
+
+	tx.Commit()
+
+	c.JSON(http.StatusOK, controller.Message{
+		Data: newGroup,
+	})
+}
+
 // JoinGroup 加入班组
 // @Summary 加入班组
 // @Description 加入班组
 // @Tags 班组相关
-// @Param user_id query int true "用户id"
+// @Param token header string true "token"
 // @Param group_key query string true "群组入群口令"
 // @Accept json
 // @Produce json
 // @Success 200 {object} controller.Message
 // @Router /wx/group/join_group [get]
 func JoinGroup(c *gin.Context) {
-	userID, err := strconv.ParseInt(c.Query("user_id"), 10, 64)
-	if common.FuncHandler(c, err, nil, common.ParameterError) {
+	claims, exist := c.Get("claims")
+	// 获取数据失败
+	if common.FuncHandler(c, exist, true, common.SystemError) {
 		return
 	}
+	userID := claims.(*model.CustomClaims).UserID
+
 	groupKey := c.Query("group_key")
 
 	// 检查userID是否存在
@@ -158,7 +169,7 @@ func JoinGroup(c *gin.Context) {
 	groupID := existGroup.ID
 	// 检查是否已经在班组
 	var existGroupMember model.GroupMember
-	err = db.Where("group_id = ? AND member_id = ?", groupID, userID).First(&existGroupMember).Error
+	err := db.Where("group_id = ? AND member_id = ?", groupID, userID).First(&existGroupMember).Error
 	if common.FuncHandler(c, err != nil, true, common.HasInGroup) {
 		return
 	}
@@ -188,16 +199,18 @@ func JoinGroup(c *gin.Context) {
 // @Summary 查询自己参与的班组
 // @Description 查询自己参与的班组，包括自己创建和加入的
 // @Tags 班组相关
-// @Param user_id query int true "用户id"
+// @Param token header string true "token"
 // @Accept json
 // @Produce json
 // @Success 200 {object} controller.Message
 // @Router /wx/group/in_group [get]
 func InGroup(c *gin.Context) {
-	userID, err := strconv.ParseInt(c.Query("user_id"), 10, 64)
-	if common.FuncHandler(c, err, nil, common.ParameterError) {
+	claims, exist := c.Get("claims")
+	// 获取数据失败
+	if common.FuncHandler(c, exist, true, common.SystemError) {
 		return
 	}
+	userID := claims.(*model.CustomClaims).UserID
 
 	// 检查userID是否存在
 	if _, ok := UserExist(c, userID).(model.WxUser); !ok {
@@ -209,7 +222,7 @@ func InGroup(c *gin.Context) {
 
 	// 查询自己创建的班组
 	var groups []model.Group
-	err = db.Where("owner_id = ?", userID).Find(&groups).Error
+	err := db.Where("owner_id = ?", userID).Find(&groups).Error
 
 	if err == nil {
 		for _, group := range groups {
@@ -226,7 +239,7 @@ func InGroup(c *gin.Context) {
 				return
 			}
 
-			groupRet.Owner = owner
+			groupRet.Owner = owner.WxUserInfo
 			groupRets = append(groupRets, groupRet)
 		}
 	}
@@ -258,7 +271,7 @@ func InGroup(c *gin.Context) {
 				return
 			}
 
-			groupRet.Owner = owner
+			groupRet.Owner = owner.WxUserInfo
 			groupRets = append(groupRets, groupRet)
 		}
 	}
@@ -272,6 +285,7 @@ func InGroup(c *gin.Context) {
 // @Summary 获取班组所有成员
 // @Description 获取班组所有成员
 // @Tags 班组相关
+// @Param token header string true "token"
 // @Param group_id query int true "班组id"
 // @Accept json
 // @Produce json
@@ -300,7 +314,7 @@ func GroupMember(c *gin.Context) {
 	}
 	var groupMemberRet model.GroupMemberRet
 	groupMemberRet.IsOwner = true
-	groupMemberRet.WxUser = user
+	groupMemberRet.WxUserInfo = user.WxUserInfo
 	groupMemberRets = append(groupMemberRets, groupMemberRet)
 
 	// 班组成员信息
@@ -318,7 +332,7 @@ func GroupMember(c *gin.Context) {
 			}
 			var groupMemberRet model.GroupMemberRet
 			groupMemberRet.IsOwner = false
-			groupMemberRet.WxUser = user
+			groupMemberRet.WxUserInfo = user.WxUserInfo
 			groupMemberRets = append(groupMemberRets, groupMemberRet)
 		}
 	}
@@ -332,6 +346,7 @@ func GroupMember(c *gin.Context) {
 // @Summary 删除班组中某个成员
 // @Description 删除班组中某个成员
 // @Tags 班组相关
+// @Param token header string true "token"
 // @Param group_id query int true "班组id"
 // @Param user_id query int true "删除用户id"
 // @Accept json
