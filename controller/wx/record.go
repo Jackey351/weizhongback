@@ -21,11 +21,19 @@ const (
 // @Summary 添加工时记录
 // @Description 添加工时记录
 // @Tags 工作记录相关
+// @Param token header string true "token"
 // @Param 工时记录数据 body model.HourRecordRequest true "工时记录数据"
 // @Produce json
 // @Success 200 {object} controller.Message
 // @Router /wx/record/add_hour_record [post]
 func AddHourRecord(c *gin.Context) {
+	claims, exist := c.Get("claims")
+	// 获取数据失败
+	if common.FuncHandler(c, exist, true, common.SystemError) {
+		return
+	}
+	userID := claims.(*model.CustomClaims).UserID
+
 	var hourRecordRequest model.HourRecordRequest
 	if common.FuncHandler(c, c.BindJSON(&hourRecordRequest), nil, common.ParameterError) {
 		return
@@ -34,7 +42,7 @@ func AddHourRecord(c *gin.Context) {
 	if _, ok := UserExist(c, hourRecordRequest.WorkerID).(model.WxUser); !ok {
 		return
 	}
-	if _, ok := UserExist(c, hourRecordRequest.AdderID).(model.WxUser); !ok {
+	if _, ok := UserExist(c, userID).(model.WxUser); !ok {
 		return
 	}
 	if _, ok := GroupExistByID(c, hourRecordRequest.GroupID).(model.Group); !ok {
@@ -65,6 +73,7 @@ func AddHourRecord(c *gin.Context) {
 
 	var record model.Record
 	record.CommonRecord = hourRecordRequest.CommonRecord
+	record.AdderID = userID
 	record.RecordType = HourRecord
 	record.RecordID = hourRecord.ID
 	record.AddTime = time.Now().Unix()
@@ -87,11 +96,19 @@ func AddHourRecord(c *gin.Context) {
 // @Summary 添加分项记录
 // @Description 添加分项记录
 // @Tags 工作记录相关
+// @Param token header string true "token"
 // @Param 分项记录数据 body model.ItemRecordRequest true "分项记录数据"
 // @Produce json
 // @Success 200 {object} controller.Message
 // @Router /wx/record/add_item_record [post]
 func AddItemRecord(c *gin.Context) {
+	claims, exist := c.Get("claims")
+	// 获取数据失败
+	if common.FuncHandler(c, exist, true, common.SystemError) {
+		return
+	}
+	userID := claims.(*model.CustomClaims).UserID
+
 	var itemRecordRequest model.ItemRecordRequest
 	if common.FuncHandler(c, c.BindJSON(&itemRecordRequest), nil, common.ParameterError) {
 		return
@@ -100,7 +117,7 @@ func AddItemRecord(c *gin.Context) {
 	if _, ok := UserExist(c, itemRecordRequest.WorkerID).(model.WxUser); !ok {
 		return
 	}
-	if _, ok := UserExist(c, itemRecordRequest.AdderID).(model.WxUser); !ok {
+	if _, ok := UserExist(c, userID).(model.WxUser); !ok {
 		return
 	}
 	if _, ok := GroupExistByID(c, itemRecordRequest.GroupID).(model.Group); !ok {
@@ -131,6 +148,7 @@ func AddItemRecord(c *gin.Context) {
 
 	var record model.Record
 	record.CommonRecord = itemRecordRequest.CommonRecord
+	record.AdderID = userID
 	record.RecordType = ItemRecord
 	record.RecordID = itemRecord.ID
 	record.AddTime = time.Now().Unix()
@@ -153,6 +171,7 @@ func AddItemRecord(c *gin.Context) {
 // @Summary 检查某日是否记录
 // @Description 检查某日是否记录
 // @Tags 工作记录相关
+// @Param token header string true "token"
 // @Param group_id query int true "班组id"
 // @Param worker_id query int true "工人id"
 // @Param date query string true "日期"
@@ -160,6 +179,12 @@ func AddItemRecord(c *gin.Context) {
 // @Success 200 {object} controller.Message
 // @Router /wx/record/check_recorded [get]
 func CheckRecorded(c *gin.Context) {
+	_, exist := c.Get("claims")
+	// 获取数据失败
+	if common.FuncHandler(c, exist, true, common.SystemError) {
+		return
+	}
+
 	var groupID int64
 	var workerID int64
 	var err error

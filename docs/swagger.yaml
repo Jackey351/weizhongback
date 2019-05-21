@@ -104,9 +104,6 @@ definitions:
     type: object
   model.HourRecordRequest:
     properties:
-      adder_id:
-        example: 1
-        type: integer
       extra_work_hours:
         example: 1
         type: number
@@ -125,9 +122,6 @@ definitions:
     type: object
   model.ItemRecordRequest:
     properties:
-      adder_id:
-        example: 1
-        type: integer
       group_id:
         example: 1
         type: integer
@@ -413,6 +407,11 @@ paths:
     post:
       description: 添加工时记录
       parameters:
+      - description: token
+        in: header
+        name: token
+        required: true
+        type: string
       - description: 工时记录数据
         in: body
         name: 工时记录数据
@@ -435,6 +434,11 @@ paths:
     post:
       description: 添加分项记录
       parameters:
+      - description: token
+        in: header
+        name: token
+        required: true
+        type: string
       - description: 分项记录数据
         in: body
         name: 分项记录数据
@@ -457,6 +461,11 @@ paths:
     get:
       description: 检查某日是否记录
       parameters:
+      - description: token
+        in: header
+        name: token
+        required: true
+        type: string
       - description: 班组id
         in: query
         name: group_id

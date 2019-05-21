@@ -288,6 +288,13 @@
                 "summary": "添加工时记录",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "description": "工时记录数据",
                         "name": "工时记录数据",
                         "in": "body",
@@ -321,6 +328,13 @@
                 "summary": "添加分项记录",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "description": "分项记录数据",
                         "name": "分项记录数据",
                         "in": "body",
@@ -353,6 +367,13 @@
                 ],
                 "summary": "检查某日是否记录",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "integer",
                         "description": "班组id",
@@ -812,10 +833,6 @@
         "model.HourRecordRequest": {
             "type": "object",
             "properties": {
-                "adder_id": {
-                    "type": "integer",
-                    "example": 1
-                },
                 "extra_work_hours": {
                     "type": "number",
                     "example": 1
@@ -841,10 +858,6 @@
         "model.ItemRecordRequest": {
             "type": "object",
             "properties": {
-                "adder_id": {
-                    "type": "integer",
-                    "example": 1
-                },
                 "group_id": {
                     "type": "integer",
                     "example": 1
