@@ -139,7 +139,11 @@ func Login(c *gin.Context) {
 		return
 	}
 
+	var ret map[string]interface{}
+	ret = make(map[string]interface{})
 	var token string
+	var userID int64
+
 	// 利用openID搜索是否已存在，存在则更新，不存在插入新记录
 	db := common.GetMySQL()
 	tx := db.Begin()
@@ -148,7 +152,7 @@ func Login(c *gin.Context) {
 	err = db.Where("open_id = ?", openID).First(&existUser).Error
 	// 已有用户
 	if err == nil {
-		userID := existUser.ID
+		userID = existUser.ID
 
 		var updateData = map[string]interface{}{"session_key": sessionKey.(string), "update_time": time.Now().Unix()}
 		err := db.Model(&existUser).Updates(updateData).Error
@@ -176,7 +180,8 @@ func Login(c *gin.Context) {
 			return
 		}
 
-		token, err = common.CreateToken(newUser.ID)
+		userID = newUser.ID
+		token, err = common.CreateToken(userID)
 		if common.FuncHandler(c, err, nil, common.SystemError) {
 			tx.Rollback()
 			return
@@ -185,7 +190,9 @@ func Login(c *gin.Context) {
 		tx.Commit()
 	}
 
+	ret["token"] = token
+	ret["user_id"] = userID
 	c.JSON(http.StatusOK, controller.Message{
-		Data: token,
+		Data: ret,
 	})
 }

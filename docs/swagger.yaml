@@ -205,6 +205,8 @@ definitions:
       sex:
         example: 男
         type: string
+      user_id:
+        type: integer
     type: object
 host: '{{.Host}}'
 info:

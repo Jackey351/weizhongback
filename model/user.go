@@ -2,6 +2,7 @@ package model
 
 // WxUserInfo 非重要个人信息
 type WxUserInfo struct {
+	ID       int64  `json:"user_id"`
 	NickName string `json:"nick_name" example:"飞燕一号"`
 	RealName string `json:"real_name" example:"张三"`
 	Sex      string `json:"sex" example:"男"`
@@ -17,7 +18,6 @@ type WxUserImportantInfo struct {
 
 // WxUser 用户信息数据库字段
 type WxUser struct {
-	ID int64 `json:"user_id"`
 	WxUserInfo
 	WxUserImportantInfo
 	Role       int
