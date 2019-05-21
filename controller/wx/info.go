@@ -13,6 +13,7 @@ import (
 // @Summary 获取所有工种
 // @Description 获取所有工种
 // @Tags 各种类型信息
+// @Param token header string true "token"
 // @Produce json
 // @Success 200 {object} controller.Message
 // @Router /wx/info/worker_types [get]
@@ -35,6 +36,7 @@ func GetWokerType(c *gin.Context) {
 // GetProjectType 获取所有工程类别
 // @Summary 获取所有工程类别
 // @Description 获取所有工程类别
+// @Param token header string true "token"
 // @Tags 各种类型信息
 // @Produce json
 // @Success 200 {object} controller.Message

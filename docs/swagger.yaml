@@ -372,6 +372,12 @@ paths:
   /wx/info/project_types:
     get:
       description: 获取所有工程类别
+      parameters:
+      - description: token
+        in: header
+        name: token
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -386,6 +392,12 @@ paths:
   /wx/info/worker_types:
     get:
       description: 获取所有工种
+      parameters:
+      - description: token
+        in: header
+        name: token
+        required: true
+        type: string
       produces:
       - application/json
       responses:

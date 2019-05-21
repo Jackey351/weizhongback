@@ -226,6 +226,15 @@
                     "各种类型信息"
                 ],
                 "summary": "获取所有工程类别",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -247,6 +256,15 @@
                     "各种类型信息"
                 ],
                 "summary": "获取所有工种",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
