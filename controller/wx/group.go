@@ -354,6 +354,13 @@ func GroupMember(c *gin.Context) {
 // @Success 200 {object} controller.Message
 // @Router /wx/group/delete_member [get]
 func DeleteMember(c *gin.Context) {
+	claims, exist := c.Get("claims")
+	// 获取数据失败
+	if common.FuncHandler(c, exist, true, common.SystemError) {
+		return
+	}
+	reqUserID := claims.(*model.CustomClaims).UserID
+
 	var groupID int64
 	var userID int64
 	var err error
@@ -367,10 +374,16 @@ func DeleteMember(c *gin.Context) {
 		return
 	}
 
-	if _, ok := UserExist(c, userID).(model.WxUser); !ok {
+	if group, ok := GroupExistByID(c, groupID).(model.Group); !ok {
 		return
+	} else {
+		// 检查是否为班组长
+		if common.FuncHandler(c, group.OwnerID == reqUserID, true, common.NoPermission) {
+			return
+		}
 	}
-	if _, ok := GroupExistByID(c, groupID).(model.Group); !ok {
+
+	if _, ok := UserExist(c, userID).(model.WxUser); !ok {
 		return
 	}
 

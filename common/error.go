@@ -168,6 +168,7 @@ const (
 
 	GroupNoExist = 40000
 	HasInGroup   = 40001
+	NoPermission = 40002
 
 	RecordHasExist = 50001
 )
@@ -200,6 +201,7 @@ var Errors = map[int]string{
 	// 群组相关
 	GroupNoExist: "不存在该群组",
 	HasInGroup:   "已在群组内",
+	NoPermission: "无权限操作",
 
 	// 工作记录相关
 	RecordHasExist: "该日已存在工作记录",
