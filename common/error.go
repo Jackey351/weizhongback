@@ -160,6 +160,7 @@ const (
 	TokenExpired        = 10009
 	TokenInvalid        = 10010
 	InvalidLogin        = 10011
+	BlockchainError     = 10012
 
 	ProjectTypeNoExist = 20000
 	WorkTypeNoExist    = 20001
@@ -184,6 +185,7 @@ var Errors = map[int]string{
 	// 系统级错误
 	SystemError:         "System error",
 	DatabaseError:       "Database error",
+	BlockchainError:     "Blockchain error",
 	ServiceUnavailable:  "Service unavailable",
 	ParameterError:      "Parameter error",
 	ResourceUnavailable: "Resource unavailable",

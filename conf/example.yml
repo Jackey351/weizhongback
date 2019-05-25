@@ -3,6 +3,7 @@ basic:
   debug: true
   port: "8080"
   maintenance: false
+  method: database
 storage:
   mysql:
     user: root
@@ -14,6 +15,9 @@ storage:
     max_open_conns: 100
     timezone: Asia%2FShanghai
     retry_interval: 20
+blockchain:
+    hyperledger:
+      url: http://123344/
 log:
   file: "log/example.log"
 wechat:

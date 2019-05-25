@@ -68,11 +68,11 @@ func main() {
 
 	// 路由
 	r.GET("/ping", controller.Ping)
-	// 小程序路由
+	// 用户相关
 	r.POST("/wx/user/update_user_info", wx.UpdateInfo)
 	r.GET("/wx/user/login", wx.Login)
 	r.GET("/wx/user/get_user_info", wx.GetUserInfo)
-
+	// 各种类型信息
 	r.GET("/wx/info/worker_types", wx.GetWokerType)
 	r.GET("/wx/info/project_types", wx.GetProjectType)
 	// 工作相关

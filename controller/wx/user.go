@@ -9,6 +9,7 @@ import (
 	"yanfei_backend/common"
 	"yanfei_backend/controller"
 	"yanfei_backend/model"
+	"yanfei_backend/storage"
 
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
@@ -16,10 +17,7 @@ import (
 
 // UserExist 根据用户id判断用户是否存在，不存在直接返回UserNoExist
 func UserExist(c *gin.Context, userID int64) interface{} {
-	db := common.GetMySQL()
-
-	var existUser model.WxUser
-	err := db.First(&existUser, userID).Error
+	existUser, err := storage.GetUserByID(userID)
 	if common.FuncHandler(c, err, nil, common.UserNoExist) {
 		return false
 	}
@@ -58,18 +56,11 @@ func UpdateInfo(c *gin.Context) {
 		return
 	}
 
-	db := common.GetMySQL()
-	tx := db.Begin()
+	err := storage.UpdateUserInfo(user, userInfo.NickName, userInfo.RealName, userInfo.Sex, userInfo.Hometown, userInfo.Phone, time.Now().Unix())
 
-	updateData := map[string]interface{}{"nick_name": userInfo.NickName, "real_name": userInfo.RealName, "sex": userInfo.Sex, "hometown": userInfo.Hometown, "phone": userInfo.Phone, "update_time": time.Now().Unix()}
-
-	err := db.Model(&user).Updates(updateData).Error
 	if common.FuncHandler(c, err, nil, common.DatabaseError) {
-		tx.Rollback()
 		return
 	}
-
-	tx.Commit()
 
 	c.JSON(http.StatusOK, controller.Message{
 		Msg: "更新成功",
@@ -93,9 +84,8 @@ func GetUserInfo(c *gin.Context) {
 	}
 
 	userID := claims.(*model.CustomClaims).UserID
-	var user model.WxUser
-	var ok bool
-	if user, ok = UserExist(c, userID).(model.WxUser); !ok {
+	user, err := storage.GetUserByID(userID)
+	if common.FuncHandler(c, err, nil, common.UserNoExist) {
 		return
 	}
 
@@ -146,12 +136,12 @@ func Login(c *gin.Context) {
 
 	// 利用openID搜索是否已存在，存在则更新，不存在插入新记录
 	db := common.GetMySQL()
-	tx := db.Begin()
 
 	var existUser model.WxUser
 	err = db.Where("open_id = ?", openID).First(&existUser).Error
 	// 已有用户
 	if err == nil {
+		tx := db.Begin()
 		userID = existUser.ID
 
 		var updateData = map[string]interface{}{"session_key": sessionKey.(string), "update_time": time.Now().Unix()}
@@ -168,26 +158,16 @@ func Login(c *gin.Context) {
 
 		tx.Commit()
 	} else {
-		var newUser model.WxUser
-		newUser.OpenID = openID.(string)
-		newUser.SessionKey = sessionKey.(string)
-		newUser.Role = worker
-		newUser.UpdateTime = time.Now().Unix()
-
-		err := tx.Create(&newUser).Error
+		newUser, err := storage.SaveNewUser(openID.(string), sessionKey.(string), worker, time.Now().Unix())
 		if common.FuncHandler(c, err, nil, common.DatabaseError) {
-			tx.Rollback()
 			return
 		}
 
 		userID = newUser.ID
 		token, err = common.CreateToken(userID)
 		if common.FuncHandler(c, err, nil, common.SystemError) {
-			tx.Rollback()
 			return
 		}
-
-		tx.Commit()
 	}
 
 	ret["token"] = token

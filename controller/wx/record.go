@@ -8,6 +8,7 @@ import (
 	"yanfei_backend/common"
 	"yanfei_backend/controller"
 	"yanfei_backend/model"
+	"yanfei_backend/storage"
 
 	"github.com/gin-gonic/gin"
 )
@@ -297,63 +298,12 @@ func GetMonthRecords(c *gin.Context) {
 	}
 	userID := claims.(*model.CustomClaims).UserID
 
-	Month := c.Query("month")
-	match, _ := regexp.MatchString("\\d{4}-\\d{2}", Month)
-	if common.FuncHandler(c, len(Month) == 7 && match, true, common.ParameterError) {
+	month := c.Query("month")
+	match, _ := regexp.MatchString("\\d{4}-\\d{2}", month)
+	if common.FuncHandler(c, len(month) == 7 && match, true, common.ParameterError) {
 		return
 	}
 
-	Month = Month + "%"
-	db := common.GetMySQL()
-
-	var records []model.Record
-	err := db.Where("worker_id = ? AND record_date LIKE ?", userID, Month).Order("record_date asc").Find(&records).Error
-
-	if err == nil {
-		var returnRecords []interface{}
-		for _, record := range records {
-			switch record.RecordType {
-			case HourRecord:
-				var hourRecordRequest model.HourRecordRequest
-				hourRecordRequest.CommonRecord = record.CommonRecord
-
-				var hourRecord model.HourRecord
-				err = db.First(&hourRecord, record.RecordID).Error
-				if common.FuncHandler(c, err, nil, common.DatabaseError) {
-					return
-				}
-
-				hourRecordRequest.WorkHours = hourRecord.WorkHours
-				hourRecordRequest.ExtraWorkHours = hourRecord.ExtraWorkHours
-
-				returnRecords = append(returnRecords, hourRecordRequest)
-				break
-			case ItemRecord:
-				var itemRecordRequest model.ItemRecordRequest
-				itemRecordRequest.CommonRecord = record.CommonRecord
-
-				var itemRecord model.ItemRecord
-				err = db.First(&itemRecord, record.RecordID).Error
-				if common.FuncHandler(c, err, nil, common.DatabaseError) {
-					return
-				}
-
-				itemRecordRequest.Subitem = itemRecord.Subitem
-				itemRecordRequest.Quantity = itemRecord.Quantity
-
-				returnRecords = append(returnRecords, itemRecordRequest)
-				break
-
-			}
-		}
-		c.JSON(http.StatusOK, controller.Message{
-			Data: returnRecords,
-		})
-	} else {
-		c.JSON(http.StatusOK, controller.Message{
-			Msg: "无记录",
-		})
-	}
 }
 
 // ConfirmRecord 确认工作记录
@@ -416,6 +366,23 @@ func ConfirmRecord(c *gin.Context) {
 	if common.FuncHandler(c, err, nil, common.DatabaseError) {
 		tx.Rollback()
 		return
+	}
+
+	switch record.RecordType {
+	case HourRecord:
+		err := storage.AddNewHourRecord(record)
+		if common.FuncHandler(c, err, nil, common.BlockchainError) {
+			tx.Rollback()
+			return
+		}
+		break
+	case ItemRecord:
+		err := storage.AddNewItemRecord(record)
+		if common.FuncHandler(c, err, nil, common.BlockchainError) {
+			tx.Rollback()
+			return
+		}
+		break
 	}
 
 	tx.Commit()
