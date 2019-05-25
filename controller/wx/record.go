@@ -1,7 +1,6 @@
 package wx
 
 import (
-	"fmt"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -58,7 +57,7 @@ func AddHourRecord(c *gin.Context) {
 	db := common.GetMySQL()
 
 	var existRecord model.Record
-	err := db.Where("group_id = ? AND worker_id = ? AND record_date = ?", hourRecordRequest.GroupID, hourRecordRequest.WorkerID, hourRecordRequest.RecordDate).First(&existRecord).Error
+	err := db.Where("worker_id = ? AND record_date = ?", hourRecordRequest.GroupID, hourRecordRequest.WorkerID, hourRecordRequest.RecordDate).First(&existRecord).Error
 	if common.FuncHandler(c, err != nil, true, common.RecordHasExist) {
 		return
 	}
@@ -134,7 +133,7 @@ func AddItemRecord(c *gin.Context) {
 	db := common.GetMySQL()
 
 	var existRecord model.Record
-	err := db.Where("group_id = ? AND worker_id = ? AND record_date = ?", itemRecordRequest.GroupID, itemRecordRequest.WorkerID, itemRecordRequest.RecordDate).First(&existRecord).Error
+	err := db.Where("worker_id = ? AND record_date = ?", itemRecordRequest.GroupID, itemRecordRequest.WorkerID, itemRecordRequest.RecordDate).First(&existRecord).Error
 	if common.FuncHandler(c, err != nil, true, common.RecordHasExist) {
 		return
 	}
@@ -300,7 +299,6 @@ func GetMonthRecords(c *gin.Context) {
 
 	Month := c.Query("month")
 	match, _ := regexp.MatchString("\\d{4}-\\d{2}", Month)
-	fmt.Println(Month, match)
 	if common.FuncHandler(c, len(Month) == 7 && match, true, common.ParameterError) {
 		return
 	}
@@ -309,7 +307,7 @@ func GetMonthRecords(c *gin.Context) {
 	db := common.GetMySQL()
 
 	var records []model.Record
-	err := db.Where("worker_id = ? AND record_date LIKE ?", userID, Month).Find(&records).Error
+	err := db.Where("worker_id = ? AND record_date LIKE ?", userID, Month).Order("record_date asc").Find(&records).Error
 
 	if err == nil {
 		var returnRecords []interface{}
