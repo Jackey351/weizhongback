@@ -289,7 +289,7 @@ func GetMonthRecords(c *gin.Context) {
 	db := common.GetMySQL()
 
 	var records []model.Record
-	err := db.Debug().Where("worker_id = ? AND record_date LIKE ?", userID, Month).Find(&records).Error
+	err := db.Where("worker_id = ? AND record_date LIKE ?", userID, Month).Find(&records).Error
 
 	if err == nil {
 		var returnRecords []interface{}
