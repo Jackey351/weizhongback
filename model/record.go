@@ -13,14 +13,17 @@ type Record struct {
 	ID      int64 `json:"id"`
 	AdderID int64 `json:"adder_id"`
 	CommonRecord
-	RecordType int64 `json:"record_type"`
-	RecordID   int64 `json:"record_id"`
-	AddTime    int64 `json:"add_time"`
+	RecordType  int64 `json:"record_type"`
+	RecordID    int64 `json:"record_id"`
+	AddTime     int64 `json:"add_time"`
+	IsConfirm   int64 `json:"is_confirm"`
+	ConfirmTime int64 `json:"confirm_time"`
 }
 
 // RetItemInfo item 记录返回信息
 type RetItemInfo struct {
 	AdderInfo WxUserInfo `json:"adder_info"`
+	RecordID  int64      `json:"record_id"`
 	ItemRecordRequest
 	AddTime int64 `json:"add_time"`
 }
@@ -28,6 +31,7 @@ type RetItemInfo struct {
 // RetHourInfo hour 记录返回信息
 type RetHourInfo struct {
 	AdderInfo WxUserInfo `json:"adder_info"`
+	RecordID  int64      `json:"record_id"`
 	HourRecordRequest
 	AddTime int64 `json:"add_time"`
 }

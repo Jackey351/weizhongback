@@ -428,6 +428,43 @@
                 }
             }
         },
+        "/wx/record/confirm_record": {
+            "get": {
+                "description": "确认工作记录",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "工作记录相关"
+                ],
+                "summary": "确认工作记录",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "工作记录id",
+                        "name": "record_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/controller.Message"
+                        }
+                    }
+                }
+            }
+        },
         "/wx/record/get_month_records": {
             "get": {
                 "description": "查看某月的工作记录",

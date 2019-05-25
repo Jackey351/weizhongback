@@ -170,7 +170,10 @@ const (
 	HasInGroup   = 40001
 	NoPermission = 40002
 
-	RecordHasExist = 50001
+	RecordHasExist      = 50001
+	RecordNoExist       = 50002
+	RecordHasConfirm    = 50003
+	NoConfirmPermission = 50004
 )
 
 // Errors 错误码
@@ -204,5 +207,8 @@ var Errors = map[int]string{
 	NoPermission: "无权限操作",
 
 	// 工作记录相关
-	RecordHasExist: "该日已存在工作记录",
+	RecordHasExist:      "该日已存在工作记录",
+	RecordNoExist:       "不存在该工作记录",
+	RecordHasConfirm:    "该工作记录已被确认",
+	NoConfirmPermission: "无确认权限",
 }

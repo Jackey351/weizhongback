@@ -91,6 +91,7 @@ func main() {
 	r.POST("/wx/record/add_item_record", wx.AddItemRecord)
 	r.GET("/wx/record/check_recorded", wx.CheckRecorded)
 	r.GET("/wx/record/get_month_records", wx.GetMonthRecords)
+	r.GET("/wx/record/confirm_record", wx.ConfirmRecord)
 
 	r.Run("0.0.0.0:" + viper.GetString("basic.port"))
 }

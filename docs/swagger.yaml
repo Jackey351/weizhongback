@@ -507,6 +507,31 @@ paths:
       summary: 检查某日是否记录
       tags:
       - 工作记录相关
+  /wx/record/confirm_record:
+    get:
+      description: 确认工作记录
+      parameters:
+      - description: token
+        in: header
+        name: token
+        required: true
+        type: string
+      - description: 工作记录id
+        in: query
+        name: record_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.Message'
+            type: object
+      summary: 确认工作记录
+      tags:
+      - 工作记录相关
   /wx/record/get_month_records:
     get:
       description: 查看某月的工作记录

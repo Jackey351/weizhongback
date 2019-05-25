@@ -236,6 +236,7 @@ func CheckRecorded(c *gin.Context) {
 			}
 
 			var retHourInfo model.RetHourInfo
+			retHourInfo.RecordID = record.ID
 			retHourInfo.AdderInfo = AdderUser.WxUserInfo
 			retHourInfo.AddTime = record.AddTime
 			retHourInfo.HourRecordRequest = hourRecordRequest
@@ -263,6 +264,7 @@ func CheckRecorded(c *gin.Context) {
 			}
 
 			var retItemInfo model.RetItemInfo
+			retItemInfo.RecordID = record.ID
 			retItemInfo.AdderInfo = AdderUser.WxUserInfo
 			retItemInfo.AddTime = record.AddTime
 			retItemInfo.ItemRecordRequest = itemRecordRequest
@@ -354,4 +356,73 @@ func GetMonthRecords(c *gin.Context) {
 			Msg: "无记录",
 		})
 	}
+}
+
+// ConfirmRecord 确认工作记录
+// @Summary 确认工作记录
+// @Description 确认工作记录
+// @Tags 工作记录相关
+// @Param token header string true "token"
+// @Param record_id query int true "工作记录id"
+// @Produce json
+// @Success 200 {object} controller.Message
+// @Router /wx/record/confirm_record [get]
+func ConfirmRecord(c *gin.Context) {
+	claims, exist := c.Get("claims")
+	// 获取数据失败
+	if common.FuncHandler(c, exist, true, common.SystemError) {
+		return
+	}
+	userID := claims.(*model.CustomClaims).UserID
+
+	recordID := c.Query("record_id")
+
+	db := common.GetMySQL()
+
+	// 检查record_id 有效性，是否存在是否已确认
+	var record model.Record
+	err := db.First(&record, recordID).Error
+	if common.FuncHandler(c, err, nil, common.RecordNoExist) {
+		return
+	}
+	if common.FuncHandler(c, record.IsConfirm == 0, true, common.RecordHasConfirm) {
+		return
+	}
+
+	// 检查userID权限，必须是相关方且不能确认自己提起的
+	var group model.Group
+	err = db.First(&group, record.GroupID).Error
+	if common.FuncHandler(c, err, nil, common.DatabaseError) {
+		return
+	}
+
+	groupOwnerID := group.OwnerID
+	adderID := record.AdderID
+	workerID := record.WorkerID
+	if adderID == workerID {
+		// 班组长确认
+		if common.FuncHandler(c, userID == groupOwnerID, true, common.NoConfirmPermission) {
+			return
+		}
+	} else {
+		// 工人确认
+		if common.FuncHandler(c, userID == workerID, true, common.NoConfirmPermission) {
+			return
+		}
+	}
+
+	tx := db.Begin()
+
+	updateData := map[string]interface{}{"is_confirm": 1, "confirm_time": time.Now().Unix()}
+	err = db.Model(&record).Updates(updateData).Error
+	if common.FuncHandler(c, err, nil, common.DatabaseError) {
+		tx.Rollback()
+		return
+	}
+
+	tx.Commit()
+
+	c.JSON(http.StatusOK, controller.Message{
+		Msg: "确认成功",
+	})
 }
