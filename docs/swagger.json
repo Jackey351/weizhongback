@@ -865,6 +865,9 @@
             "properties": {
                 "group_name": {
                     "type": "string"
+                },
+                "project_name": {
+                    "type": "string"
                 }
             }
         },

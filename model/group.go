@@ -18,7 +18,8 @@ type GroupRet struct {
 
 // GroupRequest 群组请求字段
 type GroupRequest struct {
-	GroupName string `json:"group_name"`
+	GroupName   string `json:"group_name"`
+	ProjectName string `json:"project_name"`
 }
 
 // GroupMember 群组成员数据库字段

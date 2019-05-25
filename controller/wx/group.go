@@ -106,7 +106,7 @@ func NewGroup(c *gin.Context) {
 	}
 
 	var newGroup model.Group
-	newGroup.GroupName = groupReq.GroupName
+	newGroup.GroupRequest = groupReq
 	newGroup.OwnerID = userID
 	newGroup.GroupKey = NewGroupKey()
 
