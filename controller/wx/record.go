@@ -209,51 +209,69 @@ func CheckRecorded(c *gin.Context) {
 		return
 	}
 
-	var records []model.Record
+	var record model.Record
 	db := common.GetMySQL()
 
-	err = db.Where("group_id = ? AND worker_id = ? AND record_date = ?", groupID, workerID, date).Find(&records).Error
+	err = db.Where("group_id = ? AND worker_id = ? AND record_date = ?", groupID, workerID, date).First(&record).Error
 
 	if err == nil {
-		var returnRecords []interface{}
-		for _, record := range records {
-			switch record.RecordType {
-			case HourRecord:
-				var hourRecordRequest model.HourRecordRequest
-				hourRecordRequest.CommonRecord = record.CommonRecord
+		switch record.RecordType {
+		case HourRecord:
+			var hourRecordRequest model.HourRecordRequest
+			hourRecordRequest.CommonRecord = record.CommonRecord
 
-				var hourRecord model.HourRecord
-				err = db.First(&hourRecord, record.RecordID).Error
-				if common.FuncHandler(c, err, nil, common.DatabaseError) {
-					return
-				}
-
-				hourRecordRequest.WorkHours = hourRecord.WorkHours
-				hourRecordRequest.ExtraWorkHours = hourRecord.ExtraWorkHours
-
-				returnRecords = append(returnRecords, hourRecordRequest)
-				break
-			case ItemRecord:
-				var itemRecordRequest model.ItemRecordRequest
-				itemRecordRequest.CommonRecord = record.CommonRecord
-
-				var itemRecord model.ItemRecord
-				err = db.First(&itemRecord, record.RecordID).Error
-				if common.FuncHandler(c, err, nil, common.DatabaseError) {
-					return
-				}
-
-				itemRecordRequest.Subitem = itemRecord.Subitem
-				itemRecordRequest.Quantity = itemRecord.Quantity
-
-				returnRecords = append(returnRecords, itemRecordRequest)
-				break
-
+			var hourRecord model.HourRecord
+			err = db.First(&hourRecord, record.RecordID).Error
+			if common.FuncHandler(c, err, nil, common.DatabaseError) {
+				return
 			}
+
+			hourRecordRequest.WorkHours = hourRecord.WorkHours
+			hourRecordRequest.ExtraWorkHours = hourRecord.ExtraWorkHours
+
+			var AdderUser model.WxUser
+			var ok bool
+			if AdderUser, ok = UserExist(c, record.AdderID).(model.WxUser); !ok {
+				return
+			}
+
+			var retHourInfo model.RetHourInfo
+			retHourInfo.AdderInfo = AdderUser.WxUserInfo
+			retHourInfo.AddTime = record.AddTime
+			retHourInfo.HourRecordRequest = hourRecordRequest
+			c.JSON(http.StatusOK, controller.Message{
+				Data: retHourInfo,
+			})
+			break
+		case ItemRecord:
+			var itemRecordRequest model.ItemRecordRequest
+			itemRecordRequest.CommonRecord = record.CommonRecord
+
+			var itemRecord model.ItemRecord
+			err = db.First(&itemRecord, record.RecordID).Error
+			if common.FuncHandler(c, err, nil, common.DatabaseError) {
+				return
+			}
+
+			itemRecordRequest.Subitem = itemRecord.Subitem
+			itemRecordRequest.Quantity = itemRecord.Quantity
+
+			var AdderUser model.WxUser
+			var ok bool
+			if AdderUser, ok = UserExist(c, record.AdderID).(model.WxUser); !ok {
+				return
+			}
+
+			var retItemInfo model.RetItemInfo
+			retItemInfo.AdderInfo = AdderUser.WxUserInfo
+			retItemInfo.AddTime = record.AddTime
+			retItemInfo.ItemRecordRequest = itemRecordRequest
+			c.JSON(http.StatusOK, controller.Message{
+				Data: retItemInfo,
+			})
+			break
 		}
-		c.JSON(http.StatusOK, controller.Message{
-			Data: returnRecords,
-		})
+
 	} else {
 		c.JSON(http.StatusOK, controller.Message{
 			Msg: "无记录",

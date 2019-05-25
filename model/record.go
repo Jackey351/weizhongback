@@ -18,6 +18,20 @@ type Record struct {
 	AddTime    int64 `json:"add_time"`
 }
 
+// RetItemInfo item 记录返回信息
+type RetItemInfo struct {
+	AdderInfo WxUserInfo `json:"adder_info"`
+	ItemRecordRequest
+	AddTime int64 `json:"add_time"`
+}
+
+// RetHourInfo hour 记录返回信息
+type RetHourInfo struct {
+	AdderInfo WxUserInfo `json:"adder_info"`
+	HourRecordRequest
+	AddTime int64 `json:"add_time"`
+}
+
 // HourRecord 工时数据库字段
 type HourRecord struct {
 	ID             int64   `json:"id"`
