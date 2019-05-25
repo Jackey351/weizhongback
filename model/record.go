@@ -25,7 +25,8 @@ type RetItemInfo struct {
 	AdderInfo WxUserInfo `json:"adder_info"`
 	RecordID  int64      `json:"record_id"`
 	ItemRecordRequest
-	AddTime int64 `json:"add_time"`
+	AddTime   int64 `json:"add_time"`
+	IsConfirm int64 `json:"is_confirm"`
 }
 
 // RetHourInfo hour 记录返回信息
@@ -33,7 +34,8 @@ type RetHourInfo struct {
 	AdderInfo WxUserInfo `json:"adder_info"`
 	RecordID  int64      `json:"record_id"`
 	HourRecordRequest
-	AddTime int64 `json:"add_time"`
+	AddTime   int64 `json:"add_time"`
+	IsConfirm int64 `json:"is_confirm"`
 }
 
 // HourRecord 工时数据库字段
