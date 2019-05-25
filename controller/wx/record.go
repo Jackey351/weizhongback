@@ -304,6 +304,14 @@ func GetMonthRecords(c *gin.Context) {
 		return
 	}
 
+	returnRecords, err := storage.GetRecordByMonth(userID, month)
+	if common.FuncHandler(c, err, nil, common.DatabaseError) {
+		return
+	}
+
+	c.JSON(http.StatusOK, controller.Message{
+		Data: returnRecords,
+	})
 }
 
 // ConfirmRecord 确认工作记录
