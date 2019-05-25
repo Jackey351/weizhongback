@@ -1,7 +1,9 @@
 package wx
 
 import (
+	"fmt"
 	"net/http"
+	"regexp"
 	"strconv"
 	"time"
 	"yanfei_backend/common"
@@ -211,6 +213,83 @@ func CheckRecorded(c *gin.Context) {
 	db := common.GetMySQL()
 
 	err = db.Where("group_id = ? AND worker_id = ? AND record_date = ?", groupID, workerID, date).Find(&records).Error
+
+	if err == nil {
+		var returnRecords []interface{}
+		for _, record := range records {
+			switch record.RecordType {
+			case HourRecord:
+				var hourRecordRequest model.HourRecordRequest
+				hourRecordRequest.CommonRecord = record.CommonRecord
+
+				var hourRecord model.HourRecord
+				err = db.First(&hourRecord, record.RecordID).Error
+				if common.FuncHandler(c, err, nil, common.DatabaseError) {
+					return
+				}
+
+				hourRecordRequest.WorkHours = hourRecord.WorkHours
+				hourRecordRequest.ExtraWorkHours = hourRecord.ExtraWorkHours
+
+				returnRecords = append(returnRecords, hourRecordRequest)
+				break
+			case ItemRecord:
+				var itemRecordRequest model.ItemRecordRequest
+				itemRecordRequest.CommonRecord = record.CommonRecord
+
+				var itemRecord model.ItemRecord
+				err = db.First(&itemRecord, record.RecordID).Error
+				if common.FuncHandler(c, err, nil, common.DatabaseError) {
+					return
+				}
+
+				itemRecordRequest.Subitem = itemRecord.Subitem
+				itemRecordRequest.Quantity = itemRecord.Quantity
+
+				returnRecords = append(returnRecords, itemRecordRequest)
+				break
+
+			}
+		}
+		c.JSON(http.StatusOK, controller.Message{
+			Data: returnRecords,
+		})
+	} else {
+		c.JSON(http.StatusOK, controller.Message{
+			Msg: "无记录",
+		})
+	}
+}
+
+// GetMonthRecords 查看某月的工作记录
+// @Summary 查看某月的工作记录
+// @Description 查看某月的工作记录
+// @Tags 工作记录相关
+// @Param token header string true "token"
+// @Param month query string true "月份，形如2019-04"
+// @Produce json
+// @Success 200 {object} controller.Message
+// @Router /wx/record/get_month_records [get]
+func GetMonthRecords(c *gin.Context) {
+	claims, exist := c.Get("claims")
+	// 获取数据失败
+	if common.FuncHandler(c, exist, true, common.SystemError) {
+		return
+	}
+	userID := claims.(*model.CustomClaims).UserID
+
+	Month := c.Query("month")
+	match, _ := regexp.MatchString("\\d{4}-\\d{2}", Month)
+	fmt.Println(Month, match)
+	if common.FuncHandler(c, len(Month) == 7 && match, true, common.ParameterError) {
+		return
+	}
+
+	Month = Month + "%"
+	db := common.GetMySQL()
+
+	var records []model.Record
+	err := db.Debug().Where("worker_id = ? AND record_date LIKE ?", userID, Month).Find(&records).Error
 
 	if err == nil {
 		var returnRecords []interface{}

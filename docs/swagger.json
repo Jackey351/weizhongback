@@ -428,6 +428,43 @@
                 }
             }
         },
+        "/wx/record/get_month_records": {
+            "get": {
+                "description": "查看某月的工作记录",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "工作记录相关"
+                ],
+                "summary": "查看某月的工作记录",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "月份，形如2019-04",
+                        "name": "month",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/controller.Message"
+                        }
+                    }
+                }
+            }
+        },
         "/wx/user/get_user_info": {
             "get": {
                 "description": "获取用户信息",
