@@ -5,6 +5,7 @@ type CommonRecord struct {
 	WorkerID   int64  `json:"worker_id" example:"2"`
 	GroupID    int64  `json:"group_id" example:"1"`
 	RecordDate string `json:"record_date" example:"2019-05-19"`
+	Remark     string `json:"remark"`
 }
 
 // Record 工作记录数据库字段
@@ -36,6 +37,7 @@ type ItemRecord struct {
 	ID       int64   `json:"id"`
 	Subitem  string  `json:"subitem" example:"刷墙"`
 	Quantity float64 `json:"quantity" example:"1"`
+	Unit     string  `json:"unit" example:"平方米"`
 }
 
 // ItemRecordRequest 分项记录请求头
@@ -43,4 +45,5 @@ type ItemRecordRequest struct {
 	CommonRecord
 	Subitem  string  `json:"subitem" example:"刷墙"`
 	Quantity float64 `json:"quantity" example:"1"`
+	Unit     string  `json:"unit" example:"平方米"`
 }

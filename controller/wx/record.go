@@ -127,6 +127,7 @@ func AddItemRecord(c *gin.Context) {
 	var itemRecord model.ItemRecord
 	itemRecord.Subitem = itemRecordRequest.Subitem
 	itemRecord.Quantity = itemRecordRequest.Quantity
+	itemRecord.Unit = itemRecordRequest.Unit
 
 	db := common.GetMySQL()
 

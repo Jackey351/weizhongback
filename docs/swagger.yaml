@@ -107,6 +107,8 @@ definitions:
       record_date:
         example: "2019-05-19"
         type: string
+      remark:
+        type: string
       work_hours:
         example: 1.5
         type: number
@@ -125,8 +127,13 @@ definitions:
       record_date:
         example: "2019-05-19"
         type: string
+      remark:
+        type: string
       subitem:
         example: 刷墙
+        type: string
+      unit:
+        example: 平方米
         type: string
       worker_id:
         example: 2

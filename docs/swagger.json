@@ -886,6 +886,9 @@
                     "type": "string",
                     "example": "2019-05-19"
                 },
+                "remark": {
+                    "type": "string"
+                },
                 "work_hours": {
                     "type": "number",
                     "example": 1.5
@@ -911,9 +914,16 @@
                     "type": "string",
                     "example": "2019-05-19"
                 },
+                "remark": {
+                    "type": "string"
+                },
                 "subitem": {
                     "type": "string",
                     "example": "刷墙"
+                },
+                "unit": {
+                    "type": "string",
+                    "example": "平方米"
                 },
                 "worker_id": {
                     "type": "integer",
