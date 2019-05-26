@@ -42,13 +42,13 @@ func AddHourRecord(c *gin.Context) {
 		return
 	}
 
-	if _, ok := UserExist(c, hourRecordRequest.WorkerID).(model.WxUser); !ok {
+	if _, ok := storage.UserExist(c, hourRecordRequest.WorkerID).(model.WxUser); !ok {
 		return
 	}
-	if _, ok := UserExist(c, userID).(model.WxUser); !ok {
+	if _, ok := storage.UserExist(c, userID).(model.WxUser); !ok {
 		return
 	}
-	if _, ok := GroupExistByID(c, hourRecordRequest.GroupID).(model.Group); !ok {
+	if _, ok := storage.GroupExistByID(c, hourRecordRequest.GroupID).(model.Group); !ok {
 		return
 	}
 
@@ -117,13 +117,13 @@ func AddItemRecord(c *gin.Context) {
 		return
 	}
 
-	if _, ok := UserExist(c, itemRecordRequest.WorkerID).(model.WxUser); !ok {
+	if _, ok := storage.UserExist(c, itemRecordRequest.WorkerID).(model.WxUser); !ok {
 		return
 	}
-	if _, ok := UserExist(c, userID).(model.WxUser); !ok {
+	if _, ok := storage.UserExist(c, userID).(model.WxUser); !ok {
 		return
 	}
-	if _, ok := GroupExistByID(c, itemRecordRequest.GroupID).(model.Group); !ok {
+	if _, ok := storage.GroupExistByID(c, itemRecordRequest.GroupID).(model.Group); !ok {
 		return
 	}
 
@@ -197,7 +197,7 @@ func CheckRecorded(c *gin.Context) {
 	}
 	date := c.Query("date")
 
-	if _, ok := UserExist(c, workerID).(model.WxUser); !ok {
+	if _, ok := storage.UserExist(c, workerID).(model.WxUser); !ok {
 		return
 	}
 
@@ -221,17 +221,30 @@ func CheckRecorded(c *gin.Context) {
 			hourRecordRequest.WorkHours = hourRecord.WorkHours
 			hourRecordRequest.ExtraWorkHours = hourRecord.ExtraWorkHours
 
-			var AdderUser model.WxUser
+			var adderUser model.WxUser
+			var workerUser model.WxUser
+			var group model.Group
 			var ok bool
-			if AdderUser, ok = UserExist(c, record.AdderID).(model.WxUser); !ok {
+			if adderUser, ok = storage.UserExist(c, record.AdderID).(model.WxUser); !ok {
+				return
+			}
+			if workerUser, ok = storage.UserExist(c, workerID).(model.WxUser); !ok {
+				return
+			}
+			if group, ok = storage.GroupExistByID(c, record.GroupID).(model.Group); !ok {
 				return
 			}
 
 			var retHourInfo model.RetHourInfo
 			retHourInfo.RecordID = record.ID
-			retHourInfo.AdderInfo = AdderUser.WxUserInfo
+			retHourInfo.AdderInfo = adderUser.WxUserInfo
+			retHourInfo.WorkerInfo = workerUser.WxUserInfo
+			retHourInfo.GroupInfo = group.GroupRequest
+			retHourInfo.RecordDate = record.RecordDate
+			retHourInfo.Remark = record.Remark
+			retHourInfo.WorkHours = hourRecord.WorkHours
+			retHourInfo.ExtraWorkHours = hourRecord.ExtraWorkHours
 			retHourInfo.AddTime = record.AddTime
-			retHourInfo.HourRecordRequest = hourRecordRequest
 			retHourInfo.IsConfirm = record.IsConfirm
 			c.JSON(http.StatusOK, controller.Message{
 				Data: retHourInfo,
@@ -250,17 +263,31 @@ func CheckRecorded(c *gin.Context) {
 			itemRecordRequest.Subitem = itemRecord.Subitem
 			itemRecordRequest.Quantity = itemRecord.Quantity
 
-			var AdderUser model.WxUser
+			var adderUser model.WxUser
+			var workerUser model.WxUser
+			var group model.Group
 			var ok bool
-			if AdderUser, ok = UserExist(c, record.AdderID).(model.WxUser); !ok {
+			if adderUser, ok = storage.UserExist(c, record.AdderID).(model.WxUser); !ok {
+				return
+			}
+			if workerUser, ok = storage.UserExist(c, workerID).(model.WxUser); !ok {
+				return
+			}
+			if group, ok = storage.GroupExistByID(c, record.GroupID).(model.Group); !ok {
 				return
 			}
 
 			var retItemInfo model.RetItemInfo
 			retItemInfo.RecordID = record.ID
-			retItemInfo.AdderInfo = AdderUser.WxUserInfo
+			retItemInfo.AdderInfo = adderUser.WxUserInfo
+			retItemInfo.WorkerInfo = workerUser.WxUserInfo
+			retItemInfo.GroupInfo = group.GroupRequest
+			retItemInfo.RecordDate = record.RecordDate
+			retItemInfo.Remark = record.Remark
+			retItemInfo.Subitem = itemRecord.Subitem
+			retItemInfo.Quantity = itemRecord.Quantity
+			retItemInfo.Unit = itemRecord.Unit
 			retItemInfo.AddTime = record.AddTime
-			retItemInfo.ItemRecordRequest = itemRecordRequest
 			retItemInfo.IsConfirm = record.IsConfirm
 			c.JSON(http.StatusOK, controller.Message{
 				Data: retItemInfo,
@@ -298,7 +325,7 @@ func GetMonthRecords(c *gin.Context) {
 		return
 	}
 
-	returnRecords, err := storage.GetRecordByMonth(userID, month)
+	returnRecords, err := storage.GetRecordByMonth(c, userID, month)
 	if common.FuncHandler(c, err, nil, common.DatabaseError) {
 		return
 	}

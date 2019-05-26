@@ -15,15 +15,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-// UserExist 根据用户id判断用户是否存在，不存在直接返回UserNoExist
-func UserExist(c *gin.Context, userID int64) interface{} {
-	existUser, err := storage.GetUserByID(userID)
-	if common.FuncHandler(c, err, nil, common.UserNoExist) {
-		return false
-	}
-	return existUser
-}
-
 const (
 	worker = 3
 )
@@ -52,7 +43,7 @@ func UpdateInfo(c *gin.Context) {
 	userID := claims.(*model.CustomClaims).UserID
 	var user model.WxUser
 	var ok bool
-	if user, ok = UserExist(c, userID).(model.WxUser); !ok {
+	if user, ok = storage.UserExist(c, userID).(model.WxUser); !ok {
 		return
 	}
 

@@ -12,6 +12,7 @@ import (
 	"yanfei_backend/common"
 	"yanfei_backend/model"
 
+	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 )
 
@@ -128,7 +129,7 @@ const (
 	itemRecord = 1
 )
 
-func getRecordByMonthFromDatabase(userID int64, month string) ([]interface{}, error) {
+func getRecordByMonthFromDatabase(c *gin.Context, userID int64, month string) ([]interface{}, error) {
 	month = month + "%"
 	db := common.GetMySQL()
 
@@ -140,8 +141,7 @@ func getRecordByMonthFromDatabase(userID int64, month string) ([]interface{}, er
 		for _, record := range records {
 			switch record.RecordType {
 			case hourRecord:
-				var hourRecordRequest model.HourRecordRequest
-				hourRecordRequest.CommonRecord = record.CommonRecord
+				var retHourInfo model.RetHourInfo
 
 				var hourRecord model.HourRecord
 				err = db.First(&hourRecord, record.RecordID).Error
@@ -149,10 +149,32 @@ func getRecordByMonthFromDatabase(userID int64, month string) ([]interface{}, er
 					return returnRecords, err
 				}
 
-				hourRecordRequest.WorkHours = hourRecord.WorkHours
-				hourRecordRequest.ExtraWorkHours = hourRecord.ExtraWorkHours
+				var adderUser model.WxUser
+				var workerUser model.WxUser
+				var group model.Group
+				var ok bool
+				if adderUser, ok = UserExist(c, record.AdderID).(model.WxUser); !ok {
+					return returnRecords, err
+				}
+				if workerUser, ok = UserExist(c, record.WorkerID).(model.WxUser); !ok {
+					return returnRecords, err
+				}
+				if group, ok = GroupExistByID(c, record.GroupID).(model.Group); !ok {
+					return returnRecords, err
+				}
 
-				returnRecords = append(returnRecords, hourRecordRequest)
+				retHourInfo.RecordID = hourRecord.ID
+				retHourInfo.AdderInfo = adderUser.WxUserInfo
+				retHourInfo.WorkerInfo = workerUser.WxUserInfo
+				retHourInfo.GroupInfo = group.GroupRequest
+				retHourInfo.RecordDate = record.RecordDate
+				retHourInfo.Remark = record.Remark
+				retHourInfo.WorkHours = hourRecord.WorkHours
+				retHourInfo.ExtraWorkHours = hourRecord.ExtraWorkHours
+				retHourInfo.AddTime = record.AddTime
+				retHourInfo.IsConfirm = record.IsConfirm
+
+				returnRecords = append(returnRecords, retHourInfo)
 				break
 			case itemRecord:
 				var itemRecordRequest model.ItemRecordRequest
@@ -164,10 +186,34 @@ func getRecordByMonthFromDatabase(userID int64, month string) ([]interface{}, er
 					return returnRecords, err
 				}
 
-				itemRecordRequest.Subitem = itemRecord.Subitem
-				itemRecordRequest.Quantity = itemRecord.Quantity
+				var adderUser model.WxUser
+				var workerUser model.WxUser
+				var group model.Group
+				var ok bool
+				if adderUser, ok = UserExist(c, record.AdderID).(model.WxUser); !ok {
+					return returnRecords, err
+				}
+				if workerUser, ok = UserExist(c, record.WorkerID).(model.WxUser); !ok {
+					return returnRecords, err
+				}
+				if group, ok = GroupExistByID(c, record.GroupID).(model.Group); !ok {
+					return returnRecords, err
+				}
 
-				returnRecords = append(returnRecords, itemRecordRequest)
+				var retItemInfo model.RetItemInfo
+				retItemInfo.RecordID = itemRecord.ID
+				retItemInfo.AdderInfo = adderUser.WxUserInfo
+				retItemInfo.WorkerInfo = workerUser.WxUserInfo
+				retItemInfo.GroupInfo = group.GroupRequest
+				retItemInfo.RecordDate = record.RecordDate
+				retItemInfo.Remark = record.Remark
+				retItemInfo.Subitem = itemRecord.Subitem
+				retItemInfo.Quantity = itemRecord.Quantity
+				retItemInfo.Unit = itemRecord.Unit
+				retItemInfo.AddTime = record.AddTime
+				retItemInfo.IsConfirm = record.IsConfirm
+
+				returnRecords = append(returnRecords, retItemInfo)
 				break
 			}
 		}
@@ -176,11 +222,11 @@ func getRecordByMonthFromDatabase(userID int64, month string) ([]interface{}, er
 
 }
 
-func getRecordByMonthFromHyperledger(userID int64, month string) ([]interface{}, error) {
+func getRecordByMonthFromHyperledger(c *gin.Context, userID int64, month string) ([]interface{}, error) {
 	var returnRecords []interface{}
 
-	var hourRecords []model.HourRecordRequest
-	var itemRecords []model.ItemRecordRequest
+	var hourRecords []model.RetHourInfo
+	var itemRecords []model.RetItemInfo
 
 	regex := regexp.MustCompile(`^([\d]{4})-([\d]{2})$`)
 	params := regex.FindStringSubmatch(month)
@@ -193,10 +239,6 @@ func getRecordByMonthFromHyperledger(userID int64, month string) ([]interface{},
 	if maxMonth > 12 {
 		maxMonth = 1
 		maxYear = maxYear + 1
-	}
-
-	for _, param := range params {
-		fmt.Println(param)
 	}
 
 	basicURL := viper.GetString("blockchain.hyperledger.url")
@@ -212,20 +254,38 @@ func getRecordByMonthFromHyperledger(userID int64, month string) ([]interface{},
 	json.Unmarshal(body, &datas)
 
 	for _, data := range datas {
-		var itemRecord model.ItemRecordRequest
-		itemRecord.GroupID = data["group_id"].(int64)
-		itemRecord.Quantity = data["quantity"].(float64)
-		itemRecord.RecordDate = data["date"].(string)
-		itemRecord.Remark = data["remark"].(string)
-		itemRecord.Subitem = data["subitem"].(string)
-		itemRecord.Unit = data["unit"].(string)
-		itemRecord.WorkerID, err = strconv.ParseInt(string([]byte(data["owner"].(string))[len(UserPrefix):]), 10, 64)
+		groupID := data["group_id"].(int64)
+		adderID := data["adder_id"].(int64)
+		itemworktimeID := data["itemworktimeId"].(string)
+		recordID, _ := strconv.ParseInt(itemworktimeID, 10, 64)
 
-		if err != nil {
+		var adderUser model.WxUser
+		var workerUser model.WxUser
+		var group model.Group
+		var ok bool
+		if adderUser, ok = UserExist(c, adderID).(model.WxUser); !ok {
+			return returnRecords, err
+		}
+		if workerUser, ok = UserExist(c, userID).(model.WxUser); !ok {
+			return returnRecords, err
+		}
+		if group, ok = GroupExistByID(c, groupID).(model.Group); !ok {
 			return returnRecords, err
 		}
 
-		itemRecords = append(itemRecords, itemRecord)
+		var retItemInfo model.RetItemInfo
+		retItemInfo.RecordID = recordID
+		retItemInfo.AdderInfo = adderUser.WxUserInfo
+		retItemInfo.WorkerInfo = workerUser.WxUserInfo
+		retItemInfo.GroupInfo = group.GroupRequest
+		retItemInfo.RecordDate = data["date"].(string)
+		retItemInfo.Remark = data["remark"].(string)
+		retItemInfo.Subitem = data["subitem"].(string)
+		retItemInfo.Quantity = data["quantity"].(float64)
+		retItemInfo.Unit = data["unit"].(string)
+		retItemInfo.IsConfirm = 1
+		retItemInfo.AddTime = data["add_time"].(int64)
+		itemRecords = append(itemRecords, retItemInfo)
 	}
 
 	API = fmt.Sprintf("%s/queries/selectWorktimeByMonthandOwner?owner=%s%d&moins=%d-%02d&plus=%d-%02d", basicURL, UserPrefix, userID, minYear, minMonth, maxYear, maxMonth)
@@ -239,19 +299,37 @@ func getRecordByMonthFromHyperledger(userID int64, month string) ([]interface{},
 	json.Unmarshal(body, &datas)
 
 	for _, data := range datas {
-		var hourRecord model.HourRecordRequest
-		hourRecord.GroupID = data["group_id"].(int64)
-		hourRecord.WorkHours = data["work_hours"].(float64)
-		hourRecord.RecordDate = data["date"].(string)
-		hourRecord.Remark = data["remark"].(string)
-		hourRecord.ExtraWorkHours = data["extra_work_hours"].(float64)
-		hourRecord.WorkerID, err = strconv.ParseInt(string([]byte(data["owner"].(string))[len(UserPrefix):]), 10, 64)
+		groupID := data["group_id"].(int64)
+		adderID := data["adder_id"].(int64)
+		worktimeID := data["worktimeId"].(string)
+		recordID, _ := strconv.ParseInt(worktimeID, 10, 64)
 
-		if err != nil {
+		var adderUser model.WxUser
+		var workerUser model.WxUser
+		var group model.Group
+		var ok bool
+		if adderUser, ok = UserExist(c, adderID).(model.WxUser); !ok {
+			return returnRecords, err
+		}
+		if workerUser, ok = UserExist(c, userID).(model.WxUser); !ok {
+			return returnRecords, err
+		}
+		if group, ok = GroupExistByID(c, groupID).(model.Group); !ok {
 			return returnRecords, err
 		}
 
-		hourRecords = append(hourRecords, hourRecord)
+		var retHourInfo model.RetHourInfo
+		retHourInfo.RecordID = recordID
+		retHourInfo.AdderInfo = adderUser.WxUserInfo
+		retHourInfo.WorkerInfo = workerUser.WxUserInfo
+		retHourInfo.GroupInfo = group.GroupRequest
+		retHourInfo.RecordDate = data["date"].(string)
+		retHourInfo.Remark = data["remark"].(string)
+		retHourInfo.WorkHours = data["work_hours"].(float64)
+		retHourInfo.ExtraWorkHours = data["extra_work_hours"].(float64)
+		retHourInfo.IsConfirm = 1
+		retHourInfo.AddTime = data["add_time"].(int64)
+		hourRecords = append(hourRecords, retHourInfo)
 	}
 
 	i := 0
@@ -280,11 +358,11 @@ func getRecordByMonthFromHyperledger(userID int64, month string) ([]interface{},
 }
 
 // GetRecordByMonth 获取一个月的工作记录
-func GetRecordByMonth(userID int64, month string) ([]interface{}, error) {
+func GetRecordByMonth(c *gin.Context, userID int64, month string) ([]interface{}, error) {
 	switch viper.GetString("basic.method") {
 	default:
-		return getRecordByMonthFromDatabase(userID, month)
+		return getRecordByMonthFromDatabase(c, userID, month)
 	case "hyperledger":
-		return getRecordByMonthFromHyperledger(userID, month)
+		return getRecordByMonthFromHyperledger(c, userID, month)
 	}
 }

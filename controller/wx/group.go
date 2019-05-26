@@ -8,6 +8,7 @@ import (
 	"yanfei_backend/common"
 	"yanfei_backend/controller"
 	"yanfei_backend/model"
+	"yanfei_backend/storage"
 
 	"github.com/gin-gonic/gin"
 )
@@ -50,19 +51,6 @@ func NewGroupKey() string {
 	return newGroupKey
 }
 
-// GroupExistByID 根据班组id判断班组是否存在，不存在直接返回GroupNoExist
-func GroupExistByID(c *gin.Context, groupID int64) interface{} {
-	db := common.GetMySQL()
-
-	var existGroup model.Group
-	err := db.First(&existGroup, groupID).Error
-	if common.FuncHandler(c, err, nil, common.GroupNoExist) {
-		return false
-	}
-
-	return existGroup
-}
-
 // GroupExistByKey 根据班组key判断班组是否存在，不存在直接返回GroupNoExist
 func GroupExistByKey(c *gin.Context, groupKey string) interface{} {
 	db := common.GetMySQL()
@@ -101,7 +89,7 @@ func NewGroup(c *gin.Context) {
 		return
 	}
 
-	if _, ok := UserExist(c, userID).(model.WxUser); !ok {
+	if _, ok := storage.UserExist(c, userID).(model.WxUser); !ok {
 		return
 	}
 
@@ -149,7 +137,7 @@ func JoinGroup(c *gin.Context) {
 	groupKey := c.Query("group_key")
 
 	// 检查userID是否存在
-	if _, ok := UserExist(c, userID).(model.WxUser); !ok {
+	if _, ok := storage.UserExist(c, userID).(model.WxUser); !ok {
 		return
 	}
 
@@ -213,7 +201,7 @@ func InGroup(c *gin.Context) {
 	userID := claims.(*model.CustomClaims).UserID
 
 	// 检查userID是否存在
-	if _, ok := UserExist(c, userID).(model.WxUser); !ok {
+	if _, ok := storage.UserExist(c, userID).(model.WxUser); !ok {
 		return
 	}
 
@@ -299,7 +287,7 @@ func GroupMember(c *gin.Context) {
 
 	var group model.Group
 	var ok bool
-	if group, ok = GroupExistByID(c, groupID).(model.Group); !ok {
+	if group, ok = storage.GroupExistByID(c, groupID).(model.Group); !ok {
 		return
 	}
 
@@ -374,7 +362,7 @@ func DeleteMember(c *gin.Context) {
 		return
 	}
 
-	if group, ok := GroupExistByID(c, groupID).(model.Group); !ok {
+	if group, ok := storage.GroupExistByID(c, groupID).(model.Group); !ok {
 		return
 	} else {
 		// 检查是否为班组长
@@ -383,7 +371,7 @@ func DeleteMember(c *gin.Context) {
 		}
 	}
 
-	if _, ok := UserExist(c, userID).(model.WxUser); !ok {
+	if _, ok := storage.UserExist(c, userID).(model.WxUser); !ok {
 		return
 	}
 

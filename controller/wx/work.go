@@ -8,6 +8,7 @@ import (
 	"yanfei_backend/common"
 	"yanfei_backend/controller"
 	"yanfei_backend/model"
+	"yanfei_backend/storage"
 
 	"github.com/gin-gonic/gin"
 )
@@ -45,7 +46,7 @@ func PublishDianWork(c *gin.Context) {
 	db := common.GetMySQL()
 
 	// 检查userID是否存在
-	if _, ok := UserExist(c, userID).(model.WxUser); !ok {
+	if _, ok := storage.UserExist(c, userID).(model.WxUser); !ok {
 		return
 	}
 
@@ -139,7 +140,7 @@ func PublishBaoWork(c *gin.Context) {
 	db := common.GetMySQL()
 
 	// 检查userID是否存在
-	if _, ok := UserExist(c, userID).(model.WxUser); !ok {
+	if _, ok := storage.UserExist(c, userID).(model.WxUser); !ok {
 		return
 	}
 
@@ -234,7 +235,7 @@ func PublishTujiWork(c *gin.Context) {
 	db := common.GetMySQL()
 
 	// 检查userID是否存在
-	if _, ok := UserExist(c, userID).(model.WxUser); !ok {
+	if _, ok := storage.UserExist(c, userID).(model.WxUser); !ok {
 		return
 	}
 
