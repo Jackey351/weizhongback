@@ -397,13 +397,6 @@
                     },
                     {
                         "type": "integer",
-                        "description": "班组id",
-                        "name": "group_id",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
                         "description": "工人id",
                         "name": "worker_id",
                         "in": "query",

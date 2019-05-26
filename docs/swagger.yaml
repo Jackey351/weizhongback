@@ -481,11 +481,6 @@ paths:
         name: token
         required: true
         type: string
-      - description: 班组id
-        in: query
-        name: group_id
-        required: true
-        type: integer
       - description: 工人id
         in: query
         name: worker_id
