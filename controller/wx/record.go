@@ -188,14 +188,9 @@ func CheckRecorded(c *gin.Context) {
 		return
 	}
 
-	var groupID int64
 	var workerID int64
 	var err error
 
-	groupID, err = strconv.ParseInt(c.Query("group_id"), 10, 64)
-	if common.FuncHandler(c, err, nil, common.ParameterError) {
-		return
-	}
 	workerID, err = strconv.ParseInt(c.Query("worker_id"), 10, 64)
 	if common.FuncHandler(c, err, nil, common.ParameterError) {
 		return
@@ -203,9 +198,6 @@ func CheckRecorded(c *gin.Context) {
 	date := c.Query("date")
 
 	if _, ok := UserExist(c, workerID).(model.WxUser); !ok {
-		return
-	}
-	if _, ok := GroupExistByID(c, groupID).(model.Group); !ok {
 		return
 	}
 
