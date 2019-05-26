@@ -176,7 +176,6 @@ func AddItemRecord(c *gin.Context) {
 // @Description 检查某日是否记录
 // @Tags 工作记录相关
 // @Param token header string true "token"
-// @Param group_id query int true "班组id"
 // @Param worker_id query int true "工人id"
 // @Param date query string true "日期"
 // @Produce json
@@ -213,7 +212,7 @@ func CheckRecorded(c *gin.Context) {
 	var record model.Record
 	db := common.GetMySQL()
 
-	err = db.Where("group_id = ? AND worker_id = ? AND record_date = ?", groupID, workerID, date).First(&record).Error
+	err = db.Where("worker_id = ? AND record_date = ?", workerID, date).First(&record).Error
 
 	if err == nil {
 		switch record.RecordType {
