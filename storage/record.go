@@ -133,7 +133,7 @@ func getRecordByMonthFromDatabase(userID int64, month string) ([]interface{}, er
 	db := common.GetMySQL()
 
 	var records []model.Record
-	err := db.Where("worker_id = ? AND record_date LIKE ?", userID, month).Order("record_date asc").Find(&records).Error
+	err := db.Where("is_confirm = 1 AND worker_id = ? AND record_date LIKE ?", userID, month).Order("record_date asc").Find(&records).Error
 
 	var returnRecords []interface{}
 	if err == nil {
