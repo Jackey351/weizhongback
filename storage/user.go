@@ -11,17 +11,16 @@ import (
 	"yanfei_backend/common"
 	"yanfei_backend/model"
 
-	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 )
 
 // UserExist 根据用户id判断用户是否存在，不存在直接返回UserNoExist
-func UserExist(c *gin.Context, userID int64) interface{} {
+func UserExist(userID int64) (model.WxUser, error) {
 	existUser, err := GetUserByID(userID)
-	if common.FuncHandler(c, err, nil, common.UserNoExist) {
-		return false
+	if err != nil {
+		return existUser, err
 	}
-	return existUser
+	return existUser, nil
 }
 
 // UserPrefix 在区块链上的用户前缀

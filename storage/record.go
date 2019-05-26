@@ -12,7 +12,6 @@ import (
 	"yanfei_backend/common"
 	"yanfei_backend/model"
 
-	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 )
 
@@ -129,7 +128,7 @@ const (
 	itemRecord = 1
 )
 
-func getRecordByMonthFromDatabase(c *gin.Context, userID int64, month string) ([]interface{}, error) {
+func getRecordByMonthFromDatabase(userID int64, month string) ([]interface{}, error) {
 	month = month + "%"
 	db := common.GetMySQL()
 
@@ -152,14 +151,17 @@ func getRecordByMonthFromDatabase(c *gin.Context, userID int64, month string) ([
 				var adderUser model.WxUser
 				var workerUser model.WxUser
 				var group model.Group
-				var ok bool
-				if adderUser, ok = UserExist(c, record.AdderID).(model.WxUser); !ok {
+
+				adderUser, err = UserExist(record.AdderID)
+				if err != nil {
 					return returnRecords, err
 				}
-				if workerUser, ok = UserExist(c, record.WorkerID).(model.WxUser); !ok {
+				workerUser, err = UserExist(record.WorkerID)
+				if err != nil {
 					return returnRecords, err
 				}
-				if group, ok = GroupExistByID(c, record.GroupID).(model.Group); !ok {
+				group, err = GroupExistByID(record.GroupID)
+				if err != nil {
 					return returnRecords, err
 				}
 
@@ -189,14 +191,17 @@ func getRecordByMonthFromDatabase(c *gin.Context, userID int64, month string) ([
 				var adderUser model.WxUser
 				var workerUser model.WxUser
 				var group model.Group
-				var ok bool
-				if adderUser, ok = UserExist(c, record.AdderID).(model.WxUser); !ok {
+
+				adderUser, err = UserExist(record.AdderID)
+				if err != nil {
 					return returnRecords, err
 				}
-				if workerUser, ok = UserExist(c, record.WorkerID).(model.WxUser); !ok {
+				workerUser, err = UserExist(record.WorkerID)
+				if err != nil {
 					return returnRecords, err
 				}
-				if group, ok = GroupExistByID(c, record.GroupID).(model.Group); !ok {
+				group, err = GroupExistByID(record.GroupID)
+				if err != nil {
 					return returnRecords, err
 				}
 
@@ -222,7 +227,7 @@ func getRecordByMonthFromDatabase(c *gin.Context, userID int64, month string) ([
 
 }
 
-func getRecordByMonthFromHyperledger(c *gin.Context, userID int64, month string) ([]interface{}, error) {
+func getRecordByMonthFromHyperledger(userID int64, month string) ([]interface{}, error) {
 	var returnRecords []interface{}
 
 	var hourRecords []model.RetHourInfo
@@ -262,14 +267,16 @@ func getRecordByMonthFromHyperledger(c *gin.Context, userID int64, month string)
 		var adderUser model.WxUser
 		var workerUser model.WxUser
 		var group model.Group
-		var ok bool
-		if adderUser, ok = UserExist(c, adderID).(model.WxUser); !ok {
+		adderUser, err = UserExist(adderID)
+		if err != nil {
 			return returnRecords, err
 		}
-		if workerUser, ok = UserExist(c, userID).(model.WxUser); !ok {
+		workerUser, err = UserExist(userID)
+		if err != nil {
 			return returnRecords, err
 		}
-		if group, ok = GroupExistByID(c, groupID).(model.Group); !ok {
+		group, err = GroupExistByID(groupID)
+		if err != nil {
 			return returnRecords, err
 		}
 
@@ -307,14 +314,16 @@ func getRecordByMonthFromHyperledger(c *gin.Context, userID int64, month string)
 		var adderUser model.WxUser
 		var workerUser model.WxUser
 		var group model.Group
-		var ok bool
-		if adderUser, ok = UserExist(c, adderID).(model.WxUser); !ok {
+		adderUser, err = UserExist(adderID)
+		if err != nil {
 			return returnRecords, err
 		}
-		if workerUser, ok = UserExist(c, userID).(model.WxUser); !ok {
+		workerUser, err = UserExist(userID)
+		if err != nil {
 			return returnRecords, err
 		}
-		if group, ok = GroupExistByID(c, groupID).(model.Group); !ok {
+		group, err = GroupExistByID(groupID)
+		if err != nil {
 			return returnRecords, err
 		}
 
@@ -358,11 +367,11 @@ func getRecordByMonthFromHyperledger(c *gin.Context, userID int64, month string)
 }
 
 // GetRecordByMonth 获取一个月的工作记录
-func GetRecordByMonth(c *gin.Context, userID int64, month string) ([]interface{}, error) {
+func GetRecordByMonth(userID int64, month string) ([]interface{}, error) {
 	switch viper.GetString("basic.method") {
 	default:
-		return getRecordByMonthFromDatabase(c, userID, month)
+		return getRecordByMonthFromDatabase(userID, month)
 	case "hyperledger":
-		return getRecordByMonthFromHyperledger(c, userID, month)
+		return getRecordByMonthFromHyperledger(userID, month)
 	}
 }

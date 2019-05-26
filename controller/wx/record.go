@@ -42,13 +42,16 @@ func AddHourRecord(c *gin.Context) {
 		return
 	}
 
-	if _, ok := storage.UserExist(c, hourRecordRequest.WorkerID).(model.WxUser); !ok {
+	_, err := storage.UserExist(hourRecordRequest.WorkerID)
+	if common.FuncHandler(c, err, nil, common.UserNoExist) {
 		return
 	}
-	if _, ok := storage.UserExist(c, userID).(model.WxUser); !ok {
+	_, err = storage.UserExist(userID)
+	if common.FuncHandler(c, err, nil, common.UserNoExist) {
 		return
 	}
-	if _, ok := storage.GroupExistByID(c, hourRecordRequest.GroupID).(model.Group); !ok {
+	_, err = storage.GroupExistByID(hourRecordRequest.GroupID)
+	if common.FuncHandler(c, err, nil, common.GroupNoExist) {
 		return
 	}
 
@@ -59,7 +62,7 @@ func AddHourRecord(c *gin.Context) {
 	db := common.GetMySQL()
 
 	var existRecord model.Record
-	err := db.Where("worker_id = ? AND record_date = ?", hourRecordRequest.GroupID, hourRecordRequest.WorkerID, hourRecordRequest.RecordDate).First(&existRecord).Error
+	err = db.Where("worker_id = ? AND record_date = ?", hourRecordRequest.GroupID, hourRecordRequest.WorkerID, hourRecordRequest.RecordDate).First(&existRecord).Error
 	if common.FuncHandler(c, err != nil, true, common.RecordHasExist) {
 		return
 	}
@@ -117,13 +120,16 @@ func AddItemRecord(c *gin.Context) {
 		return
 	}
 
-	if _, ok := storage.UserExist(c, itemRecordRequest.WorkerID).(model.WxUser); !ok {
+	_, err := storage.UserExist(itemRecordRequest.WorkerID)
+	if common.FuncHandler(c, err, nil, common.UserNoExist) {
 		return
 	}
-	if _, ok := storage.UserExist(c, userID).(model.WxUser); !ok {
+	_, err = storage.UserExist(userID)
+	if common.FuncHandler(c, err, nil, common.UserNoExist) {
 		return
 	}
-	if _, ok := storage.GroupExistByID(c, itemRecordRequest.GroupID).(model.Group); !ok {
+	_, err = storage.GroupExistByID(itemRecordRequest.GroupID)
+	if common.FuncHandler(c, err, nil, common.GroupNoExist) {
 		return
 	}
 
@@ -135,7 +141,7 @@ func AddItemRecord(c *gin.Context) {
 	db := common.GetMySQL()
 
 	var existRecord model.Record
-	err := db.Where("worker_id = ? AND record_date = ?", itemRecordRequest.GroupID, itemRecordRequest.WorkerID, itemRecordRequest.RecordDate).First(&existRecord).Error
+	err = db.Where("worker_id = ? AND record_date = ?", itemRecordRequest.GroupID, itemRecordRequest.WorkerID, itemRecordRequest.RecordDate).First(&existRecord).Error
 	if common.FuncHandler(c, err != nil, true, common.RecordHasExist) {
 		return
 	}
@@ -197,7 +203,8 @@ func CheckRecorded(c *gin.Context) {
 	}
 	date := c.Query("date")
 
-	if _, ok := storage.UserExist(c, workerID).(model.WxUser); !ok {
+	_, err = storage.UserExist(workerID)
+	if common.FuncHandler(c, err, nil, common.UserNoExist) {
 		return
 	}
 
@@ -224,14 +231,17 @@ func CheckRecorded(c *gin.Context) {
 			var adderUser model.WxUser
 			var workerUser model.WxUser
 			var group model.Group
-			var ok bool
-			if adderUser, ok = storage.UserExist(c, record.AdderID).(model.WxUser); !ok {
+
+			adderUser, err = storage.UserExist(record.AdderID)
+			if common.FuncHandler(c, err, nil, common.UserNoExist) {
 				return
 			}
-			if workerUser, ok = storage.UserExist(c, workerID).(model.WxUser); !ok {
+			workerUser, err = storage.UserExist(workerID)
+			if common.FuncHandler(c, err, nil, common.UserNoExist) {
 				return
 			}
-			if group, ok = storage.GroupExistByID(c, record.GroupID).(model.Group); !ok {
+			group, err = storage.GroupExistByID(record.GroupID)
+			if common.FuncHandler(c, err, nil, common.GroupNoExist) {
 				return
 			}
 
@@ -266,14 +276,17 @@ func CheckRecorded(c *gin.Context) {
 			var adderUser model.WxUser
 			var workerUser model.WxUser
 			var group model.Group
-			var ok bool
-			if adderUser, ok = storage.UserExist(c, record.AdderID).(model.WxUser); !ok {
+
+			adderUser, err = storage.UserExist(record.AdderID)
+			if common.FuncHandler(c, err, nil, common.UserNoExist) {
 				return
 			}
-			if workerUser, ok = storage.UserExist(c, workerID).(model.WxUser); !ok {
+			workerUser, err = storage.UserExist(workerID)
+			if common.FuncHandler(c, err, nil, common.UserNoExist) {
 				return
 			}
-			if group, ok = storage.GroupExistByID(c, record.GroupID).(model.Group); !ok {
+			group, err = storage.GroupExistByID(record.GroupID)
+			if common.FuncHandler(c, err, nil, common.UserNoExist) {
 				return
 			}
 
@@ -325,7 +338,7 @@ func GetMonthRecords(c *gin.Context) {
 		return
 	}
 
-	returnRecords, err := storage.GetRecordByMonth(c, userID, month)
+	returnRecords, err := storage.GetRecordByMonth(userID, month)
 	if common.FuncHandler(c, err, nil, common.DatabaseError) {
 		return
 	}

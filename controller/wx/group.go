@@ -89,7 +89,8 @@ func NewGroup(c *gin.Context) {
 		return
 	}
 
-	if _, ok := storage.UserExist(c, userID).(model.WxUser); !ok {
+	_, err := storage.UserExist(userID)
+	if common.FuncHandler(c, err, nil, common.UserNoExist) {
 		return
 	}
 
@@ -101,7 +102,7 @@ func NewGroup(c *gin.Context) {
 	db := common.GetMySQL()
 	tx := db.Begin()
 
-	err := tx.Create(&newGroup).Error
+	err = tx.Create(&newGroup).Error
 	// 数据库错误
 	if common.FuncHandler(c, err, nil, common.DatabaseError) {
 		// 发生错误时回滚事务
@@ -137,7 +138,8 @@ func JoinGroup(c *gin.Context) {
 	groupKey := c.Query("group_key")
 
 	// 检查userID是否存在
-	if _, ok := storage.UserExist(c, userID).(model.WxUser); !ok {
+	_, err := storage.UserExist(userID)
+	if common.FuncHandler(c, err, nil, common.UserNoExist) {
 		return
 	}
 
@@ -157,7 +159,7 @@ func JoinGroup(c *gin.Context) {
 	groupID := existGroup.ID
 	// 检查是否已经在班组
 	var existGroupMember model.GroupMember
-	err := db.Where("group_id = ? AND member_id = ?", groupID, userID).First(&existGroupMember).Error
+	err = db.Where("group_id = ? AND member_id = ?", groupID, userID).First(&existGroupMember).Error
 	if common.FuncHandler(c, err != nil, true, common.HasInGroup) {
 		return
 	}
@@ -201,7 +203,8 @@ func InGroup(c *gin.Context) {
 	userID := claims.(*model.CustomClaims).UserID
 
 	// 检查userID是否存在
-	if _, ok := storage.UserExist(c, userID).(model.WxUser); !ok {
+	_, err := storage.UserExist(userID)
+	if common.FuncHandler(c, err, nil, common.UserNoExist) {
 		return
 	}
 
@@ -210,7 +213,7 @@ func InGroup(c *gin.Context) {
 
 	// 查询自己创建的班组
 	var groups []model.Group
-	err := db.Where("owner_id = ?", userID).Find(&groups).Error
+	err = db.Where("owner_id = ?", userID).Find(&groups).Error
 
 	if err == nil {
 		for _, group := range groups {
@@ -286,8 +289,8 @@ func GroupMember(c *gin.Context) {
 	}
 
 	var group model.Group
-	var ok bool
-	if group, ok = storage.GroupExistByID(c, groupID).(model.Group); !ok {
+	group, err = storage.GroupExistByID(groupID)
+	if common.FuncHandler(c, err, nil, common.GroupNoExist) {
 		return
 	}
 
@@ -362,16 +365,17 @@ func DeleteMember(c *gin.Context) {
 		return
 	}
 
-	if group, ok := storage.GroupExistByID(c, groupID).(model.Group); !ok {
+	group, err := storage.GroupExistByID(groupID)
+	if common.FuncHandler(c, err, nil, common.GroupNoExist) {
 		return
-	} else {
-		// 检查是否为班组长
-		if common.FuncHandler(c, group.OwnerID == reqUserID, true, common.NoPermission) {
-			return
-		}
+	}
+	// 检查是否为班组长
+	if common.FuncHandler(c, group.OwnerID == reqUserID, true, common.NoPermission) {
+		return
 	}
 
-	if _, ok := storage.UserExist(c, userID).(model.WxUser); !ok {
+	_, err = storage.UserExist(userID)
+	if common.FuncHandler(c, err, nil, common.UserNoExist) {
 		return
 	}
 

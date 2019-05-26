@@ -42,12 +42,12 @@ func UpdateInfo(c *gin.Context) {
 
 	userID := claims.(*model.CustomClaims).UserID
 	var user model.WxUser
-	var ok bool
-	if user, ok = storage.UserExist(c, userID).(model.WxUser); !ok {
+	user, err := storage.UserExist(userID)
+	if common.FuncHandler(c, err, nil, common.UserNoExist) {
 		return
 	}
 
-	err := storage.UpdateUserInfo(user, userInfo.NickName, userInfo.RealName, userInfo.Sex, userInfo.Hometown, userInfo.Phone, time.Now().Unix())
+	err = storage.UpdateUserInfo(user, userInfo.NickName, userInfo.RealName, userInfo.Sex, userInfo.Hometown, userInfo.Phone, time.Now().Unix())
 
 	if common.FuncHandler(c, err, nil, common.DatabaseError) {
 		return

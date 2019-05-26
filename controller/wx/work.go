@@ -46,7 +46,8 @@ func PublishDianWork(c *gin.Context) {
 	db := common.GetMySQL()
 
 	// 检查userID是否存在
-	if _, ok := storage.UserExist(c, userID).(model.WxUser); !ok {
+	_, err := storage.UserExist(userID)
+	if common.FuncHandler(c, err, nil, common.UserNoExist) {
 		return
 	}
 
@@ -55,7 +56,7 @@ func PublishDianWork(c *gin.Context) {
 	workerType := dianWorkReq.BasicWork.WorkerType
 
 	var res model.ProjectType
-	err := db.Where("name = ?", projectType).First(&res).Error
+	err = db.Where("name = ?", projectType).First(&res).Error
 	// 找不到数据
 	if common.FuncHandler(c, err, nil, common.ProjectTypeNoExist) {
 		return
@@ -140,7 +141,8 @@ func PublishBaoWork(c *gin.Context) {
 	db := common.GetMySQL()
 
 	// 检查userID是否存在
-	if _, ok := storage.UserExist(c, userID).(model.WxUser); !ok {
+	_, err := storage.UserExist(userID)
+	if common.FuncHandler(c, err, nil, common.UserNoExist) {
 		return
 	}
 
@@ -149,7 +151,7 @@ func PublishBaoWork(c *gin.Context) {
 	workerType := baoWorkReq.BasicWork.WorkerType
 
 	var res model.ProjectType
-	err := db.Where("name = ?", projectType).First(&res).Error
+	err = db.Where("name = ?", projectType).First(&res).Error
 	// 找不到数据
 	if common.FuncHandler(c, err, nil, common.ProjectTypeNoExist) {
 		return
@@ -235,7 +237,8 @@ func PublishTujiWork(c *gin.Context) {
 	db := common.GetMySQL()
 
 	// 检查userID是否存在
-	if _, ok := storage.UserExist(c, userID).(model.WxUser); !ok {
+	_, err := storage.UserExist(userID)
+	if common.FuncHandler(c, err, nil, common.UserNoExist) {
 		return
 	}
 
@@ -244,7 +247,7 @@ func PublishTujiWork(c *gin.Context) {
 	workerType := tujiWorkReq.BasicWork.WorkerType
 
 	var res model.ProjectType
-	err := db.Where("name = ?", projectType).First(&res).Error
+	err = db.Where("name = ?", projectType).First(&res).Error
 	// 找不到数据
 	if common.FuncHandler(c, err, nil, common.ProjectTypeNoExist) {
 		return
