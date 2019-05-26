@@ -11,6 +11,7 @@ import (
 	"yanfei_backend/storage"
 
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
 )
 
 // 代表不同的记录类型
@@ -378,21 +379,23 @@ func ConfirmRecord(c *gin.Context) {
 		return
 	}
 
-	switch record.RecordType {
-	case HourRecord:
-		err := storage.AddNewHourRecord(record)
-		if common.FuncHandler(c, err, nil, common.BlockchainError) {
-			tx.Rollback()
-			return
+	if viper.GetString("basic.method") != "database" {
+		switch record.RecordType {
+		case HourRecord:
+			err := storage.AddNewHourRecord(record)
+			if common.FuncHandler(c, err, nil, common.BlockchainError) {
+				tx.Rollback()
+				return
+			}
+			break
+		case ItemRecord:
+			err := storage.AddNewItemRecord(record)
+			if common.FuncHandler(c, err, nil, common.BlockchainError) {
+				tx.Rollback()
+				return
+			}
+			break
 		}
-		break
-	case ItemRecord:
-		err := storage.AddNewItemRecord(record)
-		if common.FuncHandler(c, err, nil, common.BlockchainError) {
-			tx.Rollback()
-			return
-		}
-		break
 	}
 
 	tx.Commit()

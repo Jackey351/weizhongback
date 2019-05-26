@@ -40,6 +40,13 @@ func getUserByIDFromHyperledger(userID int64) (model.WxUser, error) {
 	if err != nil {
 		return existUser, err
 	}
+	if reponse.StatusCode != 200 {
+		var data map[string]interface{}
+		body, _ := ioutil.ReadAll(reponse.Body)
+		json.Unmarshal(body, &data)
+		fmt.Println(data)
+		return existUser, errors.New("系统出错")
+	}
 
 	var data map[string]interface{}
 	body, _ := ioutil.ReadAll(reponse.Body)
@@ -99,6 +106,10 @@ func saveNewUserToHyperledger(userID int64) error {
 		return err
 	}
 	if reponse.StatusCode != 200 {
+		var data map[string]interface{}
+		body, _ := ioutil.ReadAll(reponse.Body)
+		json.Unmarshal(body, &data)
+		fmt.Println(data)
 		return errors.New("系统出错")
 	}
 
@@ -176,6 +187,10 @@ func updateUserInfoToHyperledger(userID int64, nickName string, realName string,
 		return err
 	}
 	if reponse.StatusCode != 200 {
+		var data map[string]interface{}
+		body, _ := ioutil.ReadAll(reponse.Body)
+		json.Unmarshal(body, &data)
+		fmt.Println(data)
 		return errors.New("系统出错")
 	}
 
