@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"regexp"
 	"strconv"
+	"strings"
 	"yanfei_backend/common"
 	"yanfei_backend/model"
 
@@ -249,11 +250,24 @@ func getRecordByMonthFromHyperledger(userID int64, month string) ([]interface{},
 	}
 
 	basicURL := viper.GetString("blockchain.hyperledger.url")
-	API := fmt.Sprintf("%s/queries/selectItemWorktimeByMonthandOwner?owner=%s%d&moins=%d-%02d&plus=%d-%02d", basicURL, UserPrefix, userID, minYear, minMonth, maxYear, maxMonth)
+	API := fmt.Sprintf("%s/queries/selectItemWorktimeByMonthandOwner", basicURL)
+
+	p := fmt.Sprintf("?owner=%s%d&moins=%d-%02d&plus=%d-%02d", UserPrefix, userID, minYear, minMonth, maxYear, maxMonth)
+	p = strings.Replace(p, ":", "%3A", -1)
+	p = strings.Replace(p, "#", "%23", -1)
+
+	API = API + p
 	reponse, err := http.Get(API)
 
 	if err != nil {
 		return returnRecords, err
+	}
+	if reponse.StatusCode != 200 {
+		var data map[string]interface{}
+		body, _ := ioutil.ReadAll(reponse.Body)
+		json.Unmarshal(body, &data)
+		fmt.Println(data)
+		return returnRecords, errors.New("系统出错")
 	}
 
 	var datas []map[string]interface{}
@@ -261,8 +275,8 @@ func getRecordByMonthFromHyperledger(userID int64, month string) ([]interface{},
 	json.Unmarshal(body, &datas)
 
 	for _, data := range datas {
-		groupID := data["group_id"].(int64)
-		adderID := data["adder_id"].(int64)
+		groupID := int64(data["group_id"].(float64))
+		adderID := int64(data["adder_id"].(float64))
 		itemworktimeID := data["itemworktimeId"].(string)
 		recordID, _ := strconv.ParseInt(itemworktimeID, 10, 64)
 
@@ -293,25 +307,38 @@ func getRecordByMonthFromHyperledger(userID int64, month string) ([]interface{},
 		retItemInfo.Quantity = data["quantity"].(float64)
 		retItemInfo.Unit = data["unit"].(string)
 		retItemInfo.IsConfirm = 1
-		retItemInfo.AddTime = data["add_time"].(int64)
+		retItemInfo.AddTime = int64(data["add_time"].(float64))
 		retItemInfo.Type = 1
 
 		itemRecords = append(itemRecords, retItemInfo)
 	}
 
-	API = fmt.Sprintf("%s/queries/selectWorktimeByMonthandOwner?owner=%s%d&moins=%d-%02d&plus=%d-%02d", basicURL, UserPrefix, userID, minYear, minMonth, maxYear, maxMonth)
+	API = fmt.Sprintf("%s/queries/selectWorktimeByMonthandOwner", basicURL)
+
+	p = fmt.Sprintf("?owner=%s%d&moins=%d-%02d&plus=%d-%02d", UserPrefix, userID, minYear, minMonth, maxYear, maxMonth)
+	p = strings.Replace(p, ":", "%3A", -1)
+	p = strings.Replace(p, "#", "%23", -1)
+
+	API = API + p
 	reponse, err = http.Get(API)
 
 	if err != nil {
 		return returnRecords, err
+	}
+	if reponse.StatusCode != 200 {
+		var data map[string]interface{}
+		body, _ := ioutil.ReadAll(reponse.Body)
+		json.Unmarshal(body, &data)
+		fmt.Println(data)
+		return returnRecords, errors.New("系统出错")
 	}
 
 	body, _ = ioutil.ReadAll(reponse.Body)
 	json.Unmarshal(body, &datas)
 
 	for _, data := range datas {
-		groupID := data["group_id"].(int64)
-		adderID := data["adder_id"].(int64)
+		groupID := int64(data["group_id"].(float64))
+		adderID := int64(data["adder_id"].(float64))
 		worktimeID := data["worktimeId"].(string)
 		recordID, _ := strconv.ParseInt(worktimeID, 10, 64)
 
@@ -341,7 +368,7 @@ func getRecordByMonthFromHyperledger(userID int64, month string) ([]interface{},
 		retHourInfo.WorkHours = data["work_hours"].(float64)
 		retHourInfo.ExtraWorkHours = data["extra_work_hours"].(float64)
 		retHourInfo.IsConfirm = 1
-		retHourInfo.AddTime = data["add_time"].(int64)
+		retHourInfo.AddTime = int64(data["add_time"].(float64))
 		retHourInfo.Type = 0
 
 		hourRecords = append(hourRecords, retHourInfo)
