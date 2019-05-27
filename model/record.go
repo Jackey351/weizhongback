@@ -33,6 +33,7 @@ type RetItemInfo struct {
 	Unit       string       `json:"unit" example:"平方米"`
 	AddTime    int64        `json:"add_time"`
 	IsConfirm  int64        `json:"is_confirm"`
+	Type       int64        `json:"type"`
 }
 
 // RetHourInfo hour 记录返回信息
@@ -47,6 +48,7 @@ type RetHourInfo struct {
 	ExtraWorkHours float64      `json:"extra_work_hours" example:"1"`
 	AddTime        int64        `json:"add_time"`
 	IsConfirm      int64        `json:"is_confirm"`
+	Type           int64        `json:"type"`
 }
 
 // HourRecord 工时数据库字段

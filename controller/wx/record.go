@@ -256,6 +256,7 @@ func CheckRecorded(c *gin.Context) {
 			retHourInfo.ExtraWorkHours = hourRecord.ExtraWorkHours
 			retHourInfo.AddTime = record.AddTime
 			retHourInfo.IsConfirm = record.IsConfirm
+			retHourInfo.Type = 0
 			c.JSON(http.StatusOK, controller.Message{
 				Data: retHourInfo,
 			})
@@ -302,6 +303,7 @@ func CheckRecorded(c *gin.Context) {
 			retItemInfo.Unit = itemRecord.Unit
 			retItemInfo.AddTime = record.AddTime
 			retItemInfo.IsConfirm = record.IsConfirm
+			retItemInfo.Type = 1
 			c.JSON(http.StatusOK, controller.Message{
 				Data: retItemInfo,
 			})

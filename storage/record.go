@@ -175,6 +175,7 @@ func getRecordByMonthFromDatabase(userID int64, month string) ([]interface{}, er
 				retHourInfo.ExtraWorkHours = hourRecord.ExtraWorkHours
 				retHourInfo.AddTime = record.AddTime
 				retHourInfo.IsConfirm = record.IsConfirm
+				retHourInfo.Type = 0
 
 				returnRecords = append(returnRecords, retHourInfo)
 				break
@@ -217,6 +218,7 @@ func getRecordByMonthFromDatabase(userID int64, month string) ([]interface{}, er
 				retItemInfo.Unit = itemRecord.Unit
 				retItemInfo.AddTime = record.AddTime
 				retItemInfo.IsConfirm = record.IsConfirm
+				retItemInfo.Type = 1
 
 				returnRecords = append(returnRecords, retItemInfo)
 				break
@@ -292,6 +294,8 @@ func getRecordByMonthFromHyperledger(userID int64, month string) ([]interface{},
 		retItemInfo.Unit = data["unit"].(string)
 		retItemInfo.IsConfirm = 1
 		retItemInfo.AddTime = data["add_time"].(int64)
+		retItemInfo.Type = 1
+
 		itemRecords = append(itemRecords, retItemInfo)
 	}
 
@@ -338,6 +342,8 @@ func getRecordByMonthFromHyperledger(userID int64, month string) ([]interface{},
 		retHourInfo.ExtraWorkHours = data["extra_work_hours"].(float64)
 		retHourInfo.IsConfirm = 1
 		retHourInfo.AddTime = data["add_time"].(int64)
+		retHourInfo.Type = 0
+
 		hourRecords = append(hourRecords, retHourInfo)
 	}
 
