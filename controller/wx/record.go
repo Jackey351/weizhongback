@@ -62,7 +62,7 @@ func AddHourRecord(c *gin.Context) {
 	db := common.GetMySQL()
 
 	var existRecord model.Record
-	err = db.Where("worker_id = ? AND record_date = ?", hourRecordRequest.GroupID, hourRecordRequest.WorkerID, hourRecordRequest.RecordDate).First(&existRecord).Error
+	err = db.Where("worker_id = ? AND record_date = ?", hourRecordRequest.WorkerID, hourRecordRequest.RecordDate).First(&existRecord).Error
 	if common.FuncHandler(c, err != nil, true, common.RecordHasExist) {
 		return
 	}
@@ -141,7 +141,7 @@ func AddItemRecord(c *gin.Context) {
 	db := common.GetMySQL()
 
 	var existRecord model.Record
-	err = db.Where("worker_id = ? AND record_date = ?", itemRecordRequest.GroupID, itemRecordRequest.WorkerID, itemRecordRequest.RecordDate).First(&existRecord).Error
+	err = db.Where("worker_id = ? AND record_date = ?", itemRecordRequest.WorkerID, itemRecordRequest.RecordDate).First(&existRecord).Error
 	if common.FuncHandler(c, err != nil, true, common.RecordHasExist) {
 		return
 	}
