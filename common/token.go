@@ -2,66 +2,12 @@ package common
 
 import (
 	"errors"
-	"net/http"
-	"regexp"
 	"time"
-	"yanfei_backend/controller"
 	"yanfei_backend/model"
 
 	"github.com/dgrijalva/jwt-go"
-	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 )
-
-// JWTAuth 中间件，检查token
-func JWTAuth() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		var whiteList = []string{"/docs", "/wx/user/login"}
-		var requestURL = c.Request.RequestURI
-
-		for _, v := range whiteList {
-			match, _ := regexp.MatchString(v, requestURL)
-			if match {
-				c.Next()
-				return
-			}
-		}
-
-		token := c.Request.Header.Get("token")
-
-		if token == "" {
-			c.JSON(http.StatusOK, controller.Message{
-				Status: NoToken,
-				Msg:    Errors[NoToken],
-			})
-			c.Abort()
-			return
-		}
-
-		j := NewJWT()
-		// parseToken 解析token包含的信息
-		claims, err := j.ParseToken(token)
-		if err != nil {
-			if err == ErrTokenExpired {
-				c.JSON(http.StatusOK, controller.Message{
-					Status: TokenExpired,
-					Msg:    Errors[TokenExpired],
-				})
-				c.Abort()
-				return
-			}
-			c.JSON(http.StatusServiceUnavailable, controller.Message{
-				Status: TokenInvalid,
-				Msg:    Errors[TokenInvalid],
-			})
-			c.Abort()
-			return
-		}
-		// 继续交由下一个路由处理,并将解析出的信息传递下去
-		c.Set("claims", claims)
-		c.Next()
-	}
-}
 
 // 自定义错误
 var (

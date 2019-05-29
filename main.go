@@ -6,6 +6,7 @@ import (
 	"yanfei_backend/common"
 	"yanfei_backend/controller"
 	"yanfei_backend/controller/wx"
+	"yanfei_backend/middleware"
 
 	_ "yanfei_backend/docs"
 
@@ -57,9 +58,10 @@ func main() {
 
 	r := gin.Default()
 	// middleware
-	r.Use(common.ErrorHandling())
-	r.Use(common.MaintenanceHandling())
-	r.Use(common.JWTAuth())
+	r.Use(middleware.ErrorHandling())
+	r.Use(middleware.MaintenanceHandling())
+	r.Use(middleware.JWTAuth())
+	r.Use(middleware.Certification())
 
 	// swagger router
 	if viper.GetBool("basic.debug") {

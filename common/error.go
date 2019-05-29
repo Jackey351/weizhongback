@@ -2,10 +2,7 @@ package common
 
 import (
 	"fmt"
-	"log"
-	"net/http"
 
-	"github.com/getsentry/raven-go"
 	"github.com/gin-gonic/gin"
 )
 
@@ -93,58 +90,6 @@ type appErrJSON struct {
 	Message string `json:"message"`
 }
 
-// ErrorHandling 错误处理中间件
-func ErrorHandling() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		c.Next()
-		//从context获取最新的错误
-		err := c.Errors.Last()
-		if err == nil {
-			return
-		}
-		// 转义
-		var metaData GeneralReturn
-		switch err.Meta.(type) {
-		case GeneralReturn:
-			metaData = err.Meta.(GeneralReturn)
-		default:
-			return
-		}
-		switch err.Type {
-		case gin.ErrorTypePublic:
-			// 公开错误 返回对应Http状态码和错误码
-			// 如果有自定义消息 写入日志
-			if metaData.CustomMessage != "" {
-				log.Println(metaData.CustomMessage)
-				raven.CaptureMessage(fmt.Sprintf("[custom] %v", metaData.CustomMessage), map[string]string{"type": "custom"})
-			}
-			c.JSON(metaData.HTTPStatus, metaData.AppErrJSON)
-			if metaData.AppErrJSON.ErrCode < 20000 {
-				raven.CaptureMessage(fmt.Sprintf("[%v] %v", metaData.AppErrJSON.ErrCode, metaData.AppErrJSON.Message), map[string]string{"type": "system"})
-			} else {
-				raven.CaptureMessage(fmt.Sprintf("[%v] %v", metaData.AppErrJSON.ErrCode, metaData.AppErrJSON.Message), map[string]string{"type": "application"})
-			}
-			return
-		case gin.ErrorTypePrivate:
-			// 如果有自定义消息 写入日志
-			if metaData.CustomMessage != "" {
-				log.Println(metaData.CustomMessage)
-				raven.CaptureMessage(fmt.Sprintf("[custom] %v", metaData.CustomMessage), map[string]string{"type": "custom"})
-			}
-			break
-		default:
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"err_code": SystemError,
-				"message":  Errors[SystemError],
-			})
-			log.Println(c.ClientIP(), "SYSTEM ERROR")
-			raven.CaptureMessage(fmt.Sprintf("[%v] %v", 10001, Errors[10001]), map[string]string{"type": "system"})
-			return
-		}
-
-	}
-}
-
 // 错误码
 const (
 	OK = 0
@@ -161,6 +106,7 @@ const (
 	TokenInvalid        = 10010
 	InvalidLogin        = 10011
 	BlockchainError     = 10012
+	NoCertification     = 10013
 
 	ProjectTypeNoExist = 20000
 	WorkTypeNoExist    = 20001
@@ -195,6 +141,7 @@ var Errors = map[int]string{
 	TokenExpired:        "Token is expired",
 	TokenInvalid:        "Token is invalid",
 	InvalidLogin:        "Invalid login",
+	NoCertification:     "未实名认证，无法进行操作",
 
 	// 工作相关
 	ProjectTypeNoExist: "不存在该工程类别",
