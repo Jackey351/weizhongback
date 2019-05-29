@@ -45,8 +45,8 @@ type Work struct {
 
 // DianWorkRet 点工返回字段
 type DianWorkRet struct {
-	ID     int64 `json:"work_id"`
-	UserID int64 `json:"user_id"`
+	ID            int64      `json:"work_id"`
+	PublisherInfo WxUserInfo `json:"publisher_info"`
 	BasicWork
 	PricingMode     int64           `json:"pricing_mode"`
 	PublishTime     int64           `json:"publish_time"`
@@ -57,8 +57,8 @@ type DianWorkRet struct {
 
 // BaoWorkRet 包工返回字段
 type BaoWorkRet struct {
-	ID     int64 `json:"work_id"`
-	UserID int64 `json:"user_id"`
+	ID            int64      `json:"work_id"`
+	PublisherInfo WxUserInfo `json:"publisher_info"`
 	BasicWork
 	PricingMode     int64           `json:"pricing_mode"`
 	PublishTime     int64           `json:"publish_time"`
@@ -69,8 +69,8 @@ type BaoWorkRet struct {
 
 // TujiWorkRet 突击队返回字段
 type TujiWorkRet struct {
-	ID     int64 `json:"work_id"`
-	UserID int64 `json:"user_id"`
+	ID            int64      `json:"work_id"`
+	PublisherInfo WxUserInfo `json:"publisher_info"`
 	BasicWork
 	PricingMode     int64           `json:"pricing_mode"`
 	PublishTime     int64           `json:"publish_time"`

@@ -408,18 +408,23 @@ func SearchWork(c *gin.Context) {
 			switch work.PricingMode {
 			case DianWork:
 				var dianWorkRet model.DianWorkRet
-				dianWorkRet.UserID = work.UserID
 				dianWorkRet.ID = work.ID
 				dianWorkRet.BasicWork = work.BasicWork
 				dianWorkRet.Treatment = strings.Split(work.Treatment, ",")
 				dianWorkRet.PricingMode = work.PricingMode
 				dianWorkRet.PublishTime = work.PublishTime
 
+				user, err := storage.UserExist(work.UserID)
+				if common.FuncHandler(c, err, nil, common.UserNoExist) {
+					return
+				}
+				dianWorkRet.PublisherInfo = user.WxUserInfo
+
 				locationID := work.LocationID
 				dianID := work.Fid
 
 				var locationInfo model.LocationInfo
-				err := db.First(&locationInfo, locationID).Error
+				err = db.First(&locationInfo, locationID).Error
 				// 找不到数据
 				if common.FuncHandler(c, err, nil, common.DatabaseError) {
 					return
@@ -440,18 +445,23 @@ func SearchWork(c *gin.Context) {
 
 			case BaoWork:
 				var baoWorkRet model.BaoWorkRet
-				baoWorkRet.UserID = work.UserID
 				baoWorkRet.ID = work.ID
 				baoWorkRet.BasicWork = work.BasicWork
 				baoWorkRet.Treatment = strings.Split(work.Treatment, ",")
 				baoWorkRet.PricingMode = work.PricingMode
 				baoWorkRet.PublishTime = work.PublishTime
 
+				user, err := storage.UserExist(work.UserID)
+				if common.FuncHandler(c, err, nil, common.UserNoExist) {
+					return
+				}
+				baoWorkRet.PublisherInfo = user.WxUserInfo
+
 				locationID := work.LocationID
 				baoID := work.Fid
 
 				var locationInfo model.LocationInfo
-				err := db.First(&locationInfo, locationID).Error
+				err = db.First(&locationInfo, locationID).Error
 				// 找不到数据
 				if common.FuncHandler(c, err, nil, common.DatabaseError) {
 					return
@@ -470,18 +480,22 @@ func SearchWork(c *gin.Context) {
 				break
 			case TujiWork:
 				var tujiWorkRet model.TujiWorkRet
-				tujiWorkRet.UserID = work.UserID
 				tujiWorkRet.ID = work.ID
 				tujiWorkRet.BasicWork = work.BasicWork
 				tujiWorkRet.Treatment = strings.Split(work.Treatment, ",")
 				tujiWorkRet.PricingMode = work.PricingMode
 				tujiWorkRet.PublishTime = work.PublishTime
-
 				locationID := work.LocationID
 				tujiID := work.Fid
 
+				user, err := storage.UserExist(work.UserID)
+				if common.FuncHandler(c, err, nil, common.UserNoExist) {
+					return
+				}
+				tujiWorkRet.PublisherInfo = user.WxUserInfo
+
 				var locationInfo model.LocationInfo
-				err := db.First(&locationInfo, locationID).Error
+				err = db.First(&locationInfo, locationID).Error
 				// 找不到数据
 				if common.FuncHandler(c, err, nil, common.DatabaseError) {
 					return
