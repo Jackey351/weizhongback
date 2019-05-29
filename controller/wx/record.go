@@ -50,16 +50,34 @@ func AddHourRecord(c *gin.Context) {
 	if common.FuncHandler(c, err, nil, common.UserNoExist) {
 		return
 	}
-	_, err = storage.GroupExistByID(hourRecordRequest.GroupID)
+	group, err := storage.GroupExistByID(hourRecordRequest.GroupID)
 	if common.FuncHandler(c, err, nil, common.GroupNoExist) {
 		return
+	}
+
+	db := common.GetMySQL()
+	// 判断权限
+	// 记账人是班组组长
+	if group.OwnerID == userID {
+		workID := hourRecordRequest.WorkerID
+
+		var existGroupMember model.GroupMember
+		err := db.Where("group_id = ? AND member_id = ?", group.ID, workID).Find(&existGroupMember).Error
+		// 被记账人不是该班组成员无权限
+		if common.FuncHandler(c, err, nil, common.NoPermission) {
+			return
+		}
+	} else {
+		workID := hourRecordRequest.WorkerID
+		// 班组成员只能给自己记账
+		if common.FuncHandler(c, workID == userID, true, common.NoPermission) {
+			return
+		}
 	}
 
 	var hourRecord model.HourRecord
 	hourRecord.WorkHours = hourRecordRequest.WorkHours
 	hourRecord.ExtraWorkHours = hourRecordRequest.ExtraWorkHours
-
-	db := common.GetMySQL()
 
 	var existRecord model.Record
 	err = db.Where("worker_id = ? AND record_date = ?", hourRecordRequest.WorkerID, hourRecordRequest.RecordDate).First(&existRecord).Error
@@ -128,17 +146,35 @@ func AddItemRecord(c *gin.Context) {
 	if common.FuncHandler(c, err, nil, common.UserNoExist) {
 		return
 	}
-	_, err = storage.GroupExistByID(itemRecordRequest.GroupID)
+	group, err := storage.GroupExistByID(itemRecordRequest.GroupID)
 	if common.FuncHandler(c, err, nil, common.GroupNoExist) {
 		return
+	}
+
+	db := common.GetMySQL()
+	// 判断权限
+	// 记账人是班组组长
+	if group.OwnerID == userID {
+		workID := itemRecordRequest.WorkerID
+
+		var existGroupMember model.GroupMember
+		err := db.Where("group_id = ? AND member_id = ?", group.ID, workID).Find(&existGroupMember).Error
+		// 被记账人不是该班组成员无权限
+		if common.FuncHandler(c, err, nil, common.NoPermission) {
+			return
+		}
+	} else {
+		workID := itemRecordRequest.WorkerID
+		// 班组成员只能给自己记账
+		if common.FuncHandler(c, workID == userID, true, common.NoPermission) {
+			return
+		}
 	}
 
 	var itemRecord model.ItemRecord
 	itemRecord.Subitem = itemRecordRequest.Subitem
 	itemRecord.Quantity = itemRecordRequest.Quantity
 	itemRecord.Unit = itemRecordRequest.Unit
-
-	db := common.GetMySQL()
 
 	var existRecord model.Record
 	err = db.Where("worker_id = ? AND record_date = ?", itemRecordRequest.WorkerID, itemRecordRequest.RecordDate).First(&existRecord).Error
