@@ -13,9 +13,9 @@ import (
 // Certification 中间件，检查是否实名制
 func Certification() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var whiteList = []string{"/docs", "/wx/user/login", "/ping", "/wx/user/get_user_info", "/wx/user/update_user_info"}
-		var requestURL = c.Request.RequestURI
+		var whiteList = []string{"/docs", "/wx/user/login", "/ping", "/wx/user/get_user_info", "/wx/user/update_user_info", "/wx/info/project_types", "/wx/info/worker_types", "/wx/work/search"}
 
+		var requestURL = c.Request.RequestURI
 		for _, v := range whiteList {
 			match, _ := regexp.MatchString(v, requestURL)
 			if match {
