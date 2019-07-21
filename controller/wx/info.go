@@ -2,9 +2,9 @@ package wx
 
 import (
 	"net/http"
-	"yanfei_backend/common"
-	"yanfei_backend/controller"
-	"yanfei_backend/model"
+	"hackthoon/common"
+	"hackthoon/controller"
+	"hackthoon/model"
 
 	"github.com/gin-gonic/gin"
 )

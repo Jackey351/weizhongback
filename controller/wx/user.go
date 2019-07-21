@@ -3,13 +3,13 @@ package wx
 import (
 	"encoding/json"
 	"fmt"
+	"hackthoon/common"
+	"hackthoon/controller"
+	"hackthoon/model"
+	"hackthoon/storage"
 	"io/ioutil"
 	"net/http"
 	"time"
-	"yanfei_backend/common"
-	"yanfei_backend/controller"
-	"yanfei_backend/model"
-	"yanfei_backend/storage"
 
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"

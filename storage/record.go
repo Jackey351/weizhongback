@@ -1,48 +1,40 @@
 package storage
 
 import (
-	"bytes"
-	"encoding/json"
-	"errors"
 	"fmt"
+	"hackthoon/common"
+	"hackthoon/model"
 	"io/ioutil"
-	"net/http"
-	"regexp"
+	"log"
+	"os/exec"
 	"strconv"
-	"strings"
-	"yanfei_backend/common"
-	"yanfei_backend/model"
-
-	"github.com/spf13/viper"
 )
 
-type hourRecordBC struct {
-	Class       string  `json:"$class"`
-	ID          string  `json:"worktimeId"`
-	AdderID     int64   `json:"adder_id"`
-	GroupID     int64   `json:"group_id"`
-	Date        string  `json:"date"`
-	AddTime     int64   `json:"add_time"`
-	Hours       float64 `json:"work_hours"`
-	ExtraHours  float64 `json:"extra_work_hours"`
-	Remark      string  `json:"remark"`
-	ConfirmTime int64   `json:"confirm_time"`
-	Owner       string  `json:"owner"`
-}
-
-type itemRecordBC struct {
-	Class       string  `json:"$class"`
-	ID          string  `json:"itemworktimeId"`
-	AdderID     int64   `json:"adder_id"`
-	GroupID     int64   `json:"group_id"`
-	Date        string  `json:"date"`
-	AddTime     int64   `json:"add_time"`
-	Subitem     string  `json:"subitem"`
-	Quantity    float64 `json:"quantity"`
-	Unit        string  `json:"unit"`
-	Remark      string  `json:"remark"`
-	ConfirmTime int64   `json:"confirm_time"`
-	Owner       string  `json:"owner"`
+func execComdand(name string, arg ...string) error {
+	// 执行系统命令
+	// 第一个参数是命令名称
+	// 后面参数可以有多个，命令参数
+	// cmd := exec.Command("/home/scy/.conda/envs/fisco/bin/python3.6", "console.py", "call", "TableTest", "0xafabb3d842b93a244096a803570931723c46d62b", "select", "fruit")
+	cmd := exec.Command(name, arg...)
+	fmt.Println(cmd)
+	// 获取输出对象，可以从该对象中读取输出结果
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		log.Fatal(err)
+	}
+	// 保证关闭输出流
+	defer stdout.Close()
+	// 运行命令
+	if err := cmd.Start(); err != nil {
+		return err
+	}
+	// 读取输出结果
+	out, err := ioutil.ReadAll(stdout)
+	if err != nil {
+		return err
+	}
+	log.Println(string(out))
+	return nil
 }
 
 // AddNewHourRecord 添加新的工时记录
@@ -51,37 +43,9 @@ func AddNewHourRecord(record model.Record) error {
 	var hourRecord model.HourRecord
 	db.First(&hourRecord, record.RecordID)
 
-	var hourRecordBC hourRecordBC
-	hourRecordBC.Class = "org.record.Worktime"
-	hourRecordBC.ID = strconv.FormatInt(record.RecordID, 10)
-	hourRecordBC.AdderID = record.AdderID
-	hourRecordBC.GroupID = record.GroupID
-	hourRecordBC.Date = record.RecordDate
-	hourRecordBC.AddTime = record.AddTime
-	hourRecordBC.Hours = hourRecord.WorkHours
-	hourRecordBC.ExtraHours = hourRecord.ExtraWorkHours
-	hourRecordBC.Remark = record.Remark
-	hourRecordBC.ConfirmTime = record.ConfirmTime
-	hourRecordBC.Owner = fmt.Sprintf("%s%d", UserPrefix, record.WorkerID)
+	err := execComdand("/home/scy/.conda/envs/fisco/bin/python3.6", "console.py", "sendtx", "Record", "0x2114e331011bf61d2c4fc8e9899495e8c2f58716", "insert_hour_record", strconv.FormatInt(record.RecordID, 10), strconv.FormatInt(record.AdderID, 10), strconv.FormatInt(record.GroupID, 10), record.RecordDate, strconv.FormatInt(record.AddTime, 10), strconv.FormatInt(int64(hourRecord.WorkHours), 10), strconv.FormatInt(int64(hourRecord.ExtraWorkHours), 10), strconv.FormatInt(record.ConfirmTime, 10), strconv.FormatInt(record.WorkerID, 10))
 
-	b, err := json.Marshal(hourRecordBC)
-	if err != nil {
-		return err
-	}
-	body := bytes.NewBuffer([]byte(b))
-
-	basicURL := viper.GetString("blockchain.hyperledger.url")
-	API := fmt.Sprintf("%s/org.record.Worktime", basicURL)
-	reponse, err := http.Post(API, "application/json;charset=utf-8", body)
-
-	if err != nil {
-		return err
-	}
-	if reponse.StatusCode != 200 {
-		return errors.New("系统出错")
-	}
-
-	return nil
+	return err
 }
 
 // AddNewItemRecord 添加新的工项记录
@@ -90,38 +54,9 @@ func AddNewItemRecord(record model.Record) error {
 	var itemRecord model.ItemRecord
 	db.First(&itemRecord, record.RecordID)
 
-	var itemRecordBC itemRecordBC
-	itemRecordBC.Class = "org.record.Itemworktime"
-	itemRecordBC.ID = strconv.FormatInt(record.RecordID, 10)
-	itemRecordBC.AdderID = record.AdderID
-	itemRecordBC.GroupID = record.GroupID
-	itemRecordBC.Date = record.RecordDate
-	itemRecordBC.AddTime = record.AddTime
-	itemRecordBC.Subitem = itemRecord.Subitem
-	itemRecordBC.Quantity = itemRecord.Quantity
-	itemRecordBC.Unit = itemRecord.Unit
-	itemRecordBC.Remark = record.Remark
-	itemRecordBC.ConfirmTime = record.ConfirmTime
-	itemRecordBC.Owner = fmt.Sprintf("%s%d", UserPrefix, record.WorkerID)
+	err := execComdand("/home/scy/.conda/envs/fisco/bin/python3.6", "console.py", "sendtx", "Record", "0x2114e331011bf61d2c4fc8e9899495e8c2f58716", "insert_item_record", strconv.FormatInt(record.RecordID, 10), strconv.FormatInt(record.AdderID, 10), strconv.FormatInt(record.GroupID, 10), record.RecordDate, strconv.FormatInt(record.AddTime, 10), itemRecord.Subitem, strconv.FormatInt(int64(itemRecord.Quantity), 10), strconv.FormatInt(record.ConfirmTime, 10), strconv.FormatInt(record.WorkerID, 10))
 
-	b, err := json.Marshal(itemRecordBC)
-	if err != nil {
-		return err
-	}
-	body := bytes.NewBuffer([]byte(b))
-
-	basicURL := viper.GetString("blockchain.hyperledger.url")
-	API := fmt.Sprintf("%s/org.record.Itemworktime", basicURL)
-	reponse, err := http.Post(API, "application/json;charset=utf-8", body)
-
-	if err != nil {
-		return err
-	}
-	if reponse.StatusCode != 200 {
-		return errors.New("系统出错")
-	}
-
-	return nil
+	return err
 }
 
 const (
@@ -230,181 +165,7 @@ func getRecordByMonthFromDatabase(userID int64, month string) ([]interface{}, er
 
 }
 
-func getRecordByMonthFromHyperledger(userID int64, month string) ([]interface{}, error) {
-	var returnRecords []interface{}
-
-	var hourRecords []model.RetHourInfo
-	var itemRecords []model.RetItemInfo
-
-	regex := regexp.MustCompile(`^([\d]{4})-([\d]{2})$`)
-	params := regex.FindStringSubmatch(month)
-
-	minYear, _ := strconv.Atoi(params[1])
-	minMonth, _ := strconv.Atoi(params[2])
-
-	maxYear := minYear
-	maxMonth := minMonth + 1
-	if maxMonth > 12 {
-		maxMonth = 1
-		maxYear = maxYear + 1
-	}
-
-	basicURL := viper.GetString("blockchain.hyperledger.url")
-	API := fmt.Sprintf("%s/queries/selectItemWorktimeByMonthandOwner", basicURL)
-
-	p := fmt.Sprintf("?owner=%s%d&moins=%d-%02d&plus=%d-%02d", UserPrefix, userID, minYear, minMonth, maxYear, maxMonth)
-	p = strings.Replace(p, ":", "%3A", -1)
-	p = strings.Replace(p, "#", "%23", -1)
-
-	API = API + p
-	reponse, err := http.Get(API)
-
-	if err != nil {
-		return returnRecords, err
-	}
-	if reponse.StatusCode != 200 {
-		var data map[string]interface{}
-		body, _ := ioutil.ReadAll(reponse.Body)
-		json.Unmarshal(body, &data)
-		fmt.Println(data)
-		return returnRecords, errors.New("系统出错")
-	}
-
-	var datas []map[string]interface{}
-	body, _ := ioutil.ReadAll(reponse.Body)
-	json.Unmarshal(body, &datas)
-
-	for _, data := range datas {
-		groupID := int64(data["group_id"].(float64))
-		adderID := int64(data["adder_id"].(float64))
-		itemworktimeID := data["itemworktimeId"].(string)
-		recordID, _ := strconv.ParseInt(itemworktimeID, 10, 64)
-
-		var adderUser model.WxUser
-		var workerUser model.WxUser
-		var group model.Group
-		adderUser, err = UserExist(adderID)
-		if err != nil {
-			return returnRecords, err
-		}
-		workerUser, err = UserExist(userID)
-		if err != nil {
-			return returnRecords, err
-		}
-		group, err = GroupExistByID(groupID)
-		if err != nil {
-			return returnRecords, err
-		}
-
-		var retItemInfo model.RetItemInfo
-		retItemInfo.RecordID = recordID
-		retItemInfo.AdderInfo = adderUser.WxUserInfo
-		retItemInfo.WorkerInfo = workerUser.WxUserInfo
-		retItemInfo.GroupInfo = group.GroupRequest
-		retItemInfo.RecordDate = data["date"].(string)
-		retItemInfo.Remark = data["remark"].(string)
-		retItemInfo.Subitem = data["subitem"].(string)
-		retItemInfo.Quantity = data["quantity"].(float64)
-		retItemInfo.Unit = data["unit"].(string)
-		retItemInfo.IsConfirm = 1
-		retItemInfo.AddTime = int64(data["add_time"].(float64))
-		retItemInfo.Type = 1
-
-		itemRecords = append(itemRecords, retItemInfo)
-	}
-
-	API = fmt.Sprintf("%s/queries/selectWorktimeByMonthandOwner", basicURL)
-
-	p = fmt.Sprintf("?owner=%s%d&moins=%d-%02d&plus=%d-%02d", UserPrefix, userID, minYear, minMonth, maxYear, maxMonth)
-	p = strings.Replace(p, ":", "%3A", -1)
-	p = strings.Replace(p, "#", "%23", -1)
-
-	API = API + p
-	reponse, err = http.Get(API)
-
-	if err != nil {
-		return returnRecords, err
-	}
-	if reponse.StatusCode != 200 {
-		var data map[string]interface{}
-		body, _ := ioutil.ReadAll(reponse.Body)
-		json.Unmarshal(body, &data)
-		fmt.Println(data)
-		return returnRecords, errors.New("系统出错")
-	}
-
-	body, _ = ioutil.ReadAll(reponse.Body)
-	json.Unmarshal(body, &datas)
-
-	for _, data := range datas {
-		groupID := int64(data["group_id"].(float64))
-		adderID := int64(data["adder_id"].(float64))
-		worktimeID := data["worktimeId"].(string)
-		recordID, _ := strconv.ParseInt(worktimeID, 10, 64)
-
-		var adderUser model.WxUser
-		var workerUser model.WxUser
-		var group model.Group
-		adderUser, err = UserExist(adderID)
-		if err != nil {
-			return returnRecords, err
-		}
-		workerUser, err = UserExist(userID)
-		if err != nil {
-			return returnRecords, err
-		}
-		group, err = GroupExistByID(groupID)
-		if err != nil {
-			return returnRecords, err
-		}
-
-		var retHourInfo model.RetHourInfo
-		retHourInfo.RecordID = recordID
-		retHourInfo.AdderInfo = adderUser.WxUserInfo
-		retHourInfo.WorkerInfo = workerUser.WxUserInfo
-		retHourInfo.GroupInfo = group.GroupRequest
-		retHourInfo.RecordDate = data["date"].(string)
-		retHourInfo.Remark = data["remark"].(string)
-		retHourInfo.WorkHours = data["work_hours"].(float64)
-		retHourInfo.ExtraWorkHours = data["extra_work_hours"].(float64)
-		retHourInfo.IsConfirm = 1
-		retHourInfo.AddTime = int64(data["add_time"].(float64))
-		retHourInfo.Type = 0
-
-		hourRecords = append(hourRecords, retHourInfo)
-	}
-
-	i := 0
-	j := 0
-
-	for i != len(hourRecords) && j != len(itemRecords) {
-		if hourRecords[i].RecordDate < itemRecords[j].RecordDate {
-			returnRecords = append(returnRecords, hourRecords[i])
-			i++
-		} else {
-			returnRecords = append(returnRecords, itemRecords[j])
-			j++
-		}
-	}
-
-	for i < len(hourRecords) {
-		returnRecords = append(returnRecords, hourRecords[i])
-		i++
-	}
-	for j < len(itemRecords) {
-		returnRecords = append(returnRecords, itemRecords[j])
-		j++
-	}
-
-	return returnRecords, nil
-}
-
 // GetRecordByMonth 获取一个月的工作记录
 func GetRecordByMonth(userID int64, month string) ([]interface{}, error) {
-	switch viper.GetString("basic.method") {
-	default:
-		return getRecordByMonthFromDatabase(userID, month)
-	case "hyperledger":
-		return getRecordByMonthFromHyperledger(userID, month)
-	}
+	return getRecordByMonthFromDatabase(userID, month)
 }

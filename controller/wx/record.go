@@ -1,14 +1,15 @@
 package wx
 
 import (
+	"fmt"
+	"hackthoon/common"
+	"hackthoon/controller"
+	"hackthoon/model"
+	"hackthoon/storage"
 	"net/http"
 	"regexp"
 	"strconv"
 	"time"
-	"yanfei_backend/common"
-	"yanfei_backend/controller"
-	"yanfei_backend/model"
-	"yanfei_backend/storage"
 
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
@@ -402,6 +403,8 @@ func ConfirmRecord(c *gin.Context) {
 		return
 	}
 	userID := claims.(*model.CustomClaims).UserID
+	userID = 35
+	fmt.Println(userID)
 
 	recordID := c.Query("record_id")
 
@@ -451,14 +454,14 @@ func ConfirmRecord(c *gin.Context) {
 	if viper.GetString("basic.method") != "database" {
 		switch record.RecordType {
 		case HourRecord:
-			err := storage.AddNewHourRecord(record)
+			err = storage.AddNewHourRecord(record)
 			if common.FuncHandler(c, err, nil, common.BlockchainError) {
 				tx.Rollback()
 				return
 			}
 			break
 		case ItemRecord:
-			err := storage.AddNewItemRecord(record)
+			err = storage.AddNewItemRecord(record)
 			if common.FuncHandler(c, err, nil, common.BlockchainError) {
 				tx.Rollback()
 				return

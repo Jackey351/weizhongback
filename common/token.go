@@ -3,7 +3,7 @@ package common
 import (
 	"errors"
 	"time"
-	"yanfei_backend/model"
+	"hackthoon/model"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/spf13/viper"

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"yanfei_backend/common"
+	"hackthoon/common"
 
 	"github.com/getsentry/raven-go"
 	"github.com/gin-gonic/gin"
@@ -58,6 +58,5 @@ func ErrorHandling() gin.HandlerFunc {
 			raven.CaptureMessage(fmt.Sprintf("[%v] %v", 10001, common.Errors[10001]), map[string]string{"type": "system"})
 			return
 		}
-
 	}
 }

@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"log"
-	"yanfei_backend/common"
+	"hackthoon/common"
 
 	"github.com/getsentry/raven-go"
 	"github.com/gin-gonic/gin"

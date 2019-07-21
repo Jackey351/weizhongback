@@ -5,10 +5,10 @@ import (
 	"strconv"
 	"strings"
 	"time"
-	"yanfei_backend/common"
-	"yanfei_backend/controller"
-	"yanfei_backend/model"
-	"yanfei_backend/storage"
+	"hackthoon/common"
+	"hackthoon/controller"
+	"hackthoon/model"
+	"hackthoon/storage"
 
 	"github.com/gin-gonic/gin"
 )

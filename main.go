@@ -3,12 +3,12 @@ package main
 import (
 	"io"
 
-	"yanfei_backend/common"
-	"yanfei_backend/controller"
-	"yanfei_backend/controller/wx"
-	"yanfei_backend/middleware"
+	"hackthoon/common"
+	"hackthoon/controller"
+	"hackthoon/controller/wx"
+	"hackthoon/middleware"
 
-	_ "yanfei_backend/docs"
+	_ "hackthoon/docs"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"

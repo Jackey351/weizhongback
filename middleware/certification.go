@@ -1,11 +1,11 @@
 package middleware
 
 import (
+	"hackthoon/common"
+	"hackthoon/model"
+	"hackthoon/storage"
 	"regexp"
 	"strings"
-	"yanfei_backend/common"
-	"yanfei_backend/model"
-	"yanfei_backend/storage"
 
 	"github.com/gin-gonic/gin"
 )
@@ -13,7 +13,7 @@ import (
 // Certification 中间件，检查是否实名制
 func Certification() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var whiteList = []string{"/docs", "/wx/user/login", "/ping", "/wx/user/get_user_info", "/wx/user/update_user_info", "/wx/info/project_types", "/wx/info/worker_types", "/wx/work/search"}
+		var whiteList = []string{"/docs", "/wx/user/login", "/ping", "/wx/user/get_user_info", "/wx/user/update_user_info", "/wx/info/project_types", "/wx/info/worker_types", "/wx/work/search", "/wx/record/confirm_record"}
 
 		var requestURL = c.Request.RequestURI
 		for _, v := range whiteList {

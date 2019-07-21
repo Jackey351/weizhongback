@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"regexp"
-	"yanfei_backend/common"
+	"hackthoon/common"
 
 	"github.com/gin-gonic/gin"
 )
